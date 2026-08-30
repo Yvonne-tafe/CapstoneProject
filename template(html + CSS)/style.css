@@ -1,0 +1,626 @@
+/* ========================================== */
+/* 1. 共用 CSS 變數與基礎設定                  */
+/* ========================================== */
+:root {
+  --color-primary: #0D4F85;
+  --color-dark: #08263D;
+  --color-text: #121A21;
+  --color-muted: #4D5963;
+  --color-bg-light: #F7FAFA;
+  --color-accent: #DBF5F2;
+  --border-color: #D1D9DE;
+  --font-main: 'Inter', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-main);
+  background: white;
+  color: var(--color-text);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: hidden;
+}
+
+/* ========================================== */
+/* 2. 共用按鈕元件                             */
+/* ========================================== */
+.btn {
+  height: 52px;
+  padding: 0 20px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: var(--font-main);
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: white;
+}
+
+.btn-outline,
+.btn:hover {
+  background: white;
+  color: var(--color-primary);
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+.btn-sm {
+  height: 40px;
+  padding: 8px 16px;
+  font-size: 14px;
+  margin-top: auto;
+}
+
+/* ========================================== */
+/* 3. 版面區塊 (Top Bar, Header, Nav)         */
+/* ========================================== */
+.top-bar {
+  width: 100%;
+  max-width: 1440px;
+  height: 40px;
+  padding: 10px 120px;
+  background: var(--color-dark);
+  color: white;
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.top-bar a {
+  color: #FFFFFF;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.top-bar a:hover {
+  color: #0047AB;
+}
+
+.top-bar a:active {
+  color: #FFFFFF;
+}
+
+.site-header {
+  width: 100%;
+  max-width: 1440px;
+  height: 92px;
+  padding: 20px 120px;
+  background: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.logo-area {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-icon {
+  width: 44px;
+  height: 44px;
+  background: var(--color-primary);
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo-text .title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-dark);
+  display: block;
+}
+
+.logo-text .subtitle {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.search-box {
+  width: 300px;
+  height: 52px;
+  padding: 0 18px;
+  background: white;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--color-muted);
+  font-size: 15px;
+}
+
+.search-icon {
+  color: var(--color-primary);
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.site-nav {
+  width: 100%;
+  max-width: 1440px;
+  height: 56px;
+  padding: 0 120px;
+  background: var(--color-bg-light);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: 36px;
+}
+
+.nav-link {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+main {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 讓裡面的 section 保持置中 */
+}
+
+/* ========================================== */
+/* 4. 主要內容區塊 (Hero & Sections)           */
+/* ========================================== */
+.hero-section {
+  width: 100%;
+  max-width: 1440px;
+  height: 420px;
+  padding: 64px 120px;
+  background: var(--color-accent);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 56px;
+  overflow: hidden;
+}
+
+.hero-content {
+  width: 814px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.badge-text {
+  color: var(--color-primary);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.hero-content h1 {
+  color: var(--color-dark);
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.hero-content p {
+  color: var(--color-text);
+  font-size: 19px;
+  line-height: 1.5;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.hero-card-visual {
+  width: 420px;
+  height: 292px;
+  position: relative;
+  background: var(--color-dark);
+  border-radius: 16px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.orange-circle {
+  width: 170px;
+  height: 170px;
+  left: 210px;
+  top: 24px;
+  position: absolute;
+  background: #F0991A;
+  border-radius: 50%;
+}
+
+.floating-box {
+  width: 260px;
+  height: 150px;
+  left: 36px;
+  top: 106px;
+  position: absolute;
+  background: white;
+  border-radius: 12px;
+  padding: 22px 24px;
+  color: var(--color-dark);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.most-used-section,
+.stay-informed-section,
+.around-citylink-section {
+  width: 100%;
+  max-width: 1440px;
+  padding: 72px 120px;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  overflow: hidden;
+}
+
+.stay-informed-section {
+  background: var(--color-bg-light);
+}
+
+.section-header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.section-badge {
+  color: var(--color-primary);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.section-header h2 {
+  color: var(--color-text);
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.section-header p {
+  color: var(--color-muted);
+  font-size: 17px;
+}
+
+/* ========================================== */
+/* 5. 網格、卡片與 Form Section              */
+/* ========================================== */
+.cards-grid,
+.announcements-grid,
+.around-grid {
+  display: flex;
+  justify-content: flex-start;
+  align-items: stretch;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.service-card,
+.announcement-card,
+.around-card {
+  flex: 1;
+  min-width: 260px;
+  padding: 24px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card-icon {
+  width: 48px;
+  height: 48px;
+  background: var(--color-accent);
+  border-radius: 24px;
+  color: var(--color-dark);
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card-title, .announcement-title, .around-title {
+  color: var(--color-text);
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.card-desc, .announcement-desc, .around-desc {
+  color: var(--color-muted);
+  font-size: 14px;
+}
+
+.card-link, .around-link {
+  color: var(--color-primary);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  margin-top: auto;
+}
+
+.announcement-date {
+  color: var(--color-muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.around-card:hover,
+.around-card.highlight-card {
+  background: #E8F5FC;
+}
+
+.around-tag {
+  color: var(--color-primary);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* Form Section 樣式 */
+.form-section {
+  width: 100%;
+  max-width: 1440px;
+  padding: 72px 120px;
+  background: var(--color-accent);
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  box-sizing: border-box;
+}
+
+.form-section .btn {
+  width: fit-content !important;
+  align-self: flex-end;
+}
+
+.form-table-container {
+  width: 100%;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.form-table-container hr {
+  width: 100% !important;
+  height: 1px;
+  background-color: var(--border-color);
+  border: none;
+  margin: 20px 0;
+}
+
+.form-table {
+  width: 100%;
+  table-layout: auto;
+  border-collapse: collapse;
+  text-align: left;
+  font-family: var(--font-main);
+}
+
+.form-table th,
+.form-table td {
+  padding: 16px 20px;
+  font-size: 15px;
+}
+
+.form-table th {
+  color: var(--color-dark);
+  font-weight: 700;
+  background: var(--color-bg-light);
+  border-bottom: 2px solid var(--border-color);
+}
+
+.form-table td {
+  color: var(--color-text);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.form-table tr:last-child td {
+  border-bottom: none;
+}
+
+.form-table tr:hover td {
+  background: #F7FAFA;
+}
+
+.form-table input[type="text"] {
+  width: 100%;
+  min-width: 140px;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-family: var(--font-main);
+  font-size: 14px;
+}
+
+/* ========================================== */
+/* 6. Footer 區塊                             */
+/* ========================================== */
+.site-footer {
+  width: 100%;
+  max-width: 1440px;
+  padding: 52px 120px 36px 120px;
+  background: var(--color-dark);
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.footer-columns {
+  display: flex;
+  justify-content: space-between;
+  gap: 40px;
+}
+
+.footer-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.footer-heading {
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.footer-text {
+  color: #BFCCD6;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.footer-bottom {
+  width: 100%;
+  color: #BFCCD6;
+  font-size: 13px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 24px;
+}
+
+/* ========================================== */
+/* 7. 手機版響應式調整 (螢幕小於 768px)       */
+/* ========================================== */
+@media screen and (max-width: 768px) {
+  .top-bar,
+  .site-header,
+  .site-nav,
+  .hero-section,
+  .most-used-section,
+  .stay-informed-section,
+  .around-citylink-section,
+  .form-section,
+  .site-footer {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  .top-bar {
+    padding: 8px 16px !important;
+    font-size: 11px;
+  }
+
+  .site-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    padding: 16px !important;
+  }
+
+  .header-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .search-box {
+    width: 100% !important;
+  }
+
+  .site-nav {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 12px 16px !important;
+  }
+
+  .hero-section {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 32px 16px !important;
+    gap: 24px;
+  }
+
+  .hero-content {
+    width: 100% !important;
+  }
+
+  .hero-content h1 {
+    font-size: 32px;
+  }
+
+  .hero-card-visual {
+    width: 100% !important;
+    height: 220px;
+  }
+
+  .cards-grid,
+  .announcements-grid,
+  .around-grid {
+    flex-direction: column;
+  }
+
+  .service-card,
+  .announcement-card,
+  .around-card {
+    width: 100% !important;
+    min-width: 100% !important;
+  }
+
+  .form-table th,
+  .form-table td {
+    padding: 12px 10px;
+    font-size: 14px;
+  }
+
+  .form-table input[type="text"] {
+    width: 100% !important;
+    min-width: 120px;
+    height: 38px;
+    padding: 0 10px;
+    font-size: 14px;
+  }
+
+  .footer-columns {
+    flex-direction: column;
+    gap: 24px;
+  }
+}

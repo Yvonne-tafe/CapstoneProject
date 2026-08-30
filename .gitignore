@@ -1,0 +1,38 @@
+# Environment variables and passwords
+.env
+.env.*
+!.env.example
+
+# PHP Composer dependencies
+/vendor/
+composer.phar
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+*.bak
+*.swp
+/tmp/
+/cache/
+
+# Testing cache
+.phpunit.result.cache
+.phpunit.cache/
+
+# IDE settings
+.vscode/
+.idea/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Local user uploads
+/uploads/*
+!/uploads/.gitkeep
+
+# Local database backups
+/database/backups/
+*.sql.gz
