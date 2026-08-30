@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="en-AU">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,126 +8,129 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 </head>
-<body>
+<body id="top">
 
  <div class="top-bar">
     <div class="container-inner">
       <span><a href="#main-content" class="skip-link">Skip To Main Content</a></span>
-      <span> &nbsp;|&nbsp; <a href=# class="skip-link">Accessibility</a></span>
-      <span> &nbsp;|&nbsp; <a href=# class="skip-link">Contact</a></span>
+      <span> &nbsp;|&nbsp; <a href="#accessibility-information" class="top-bar-link">Accessibility</a></span>
+      <span> &nbsp;|&nbsp; <a href="#contact-citylink" class="top-bar-link">Contact</a></span>
     </div>
   </div>
 
   <!-- Header -->
   <header class="site-header">
     <div class="logo-area">
-      <div class="logo-icon">CL</div>
+      <div class="logo-icon" aria-hidden="true">CL</div>
       <div class="logo-text">
         <span class="title">CityLink</span>
         <span class="subtitle">INITIATIVES</span>
       </div>
     </div>
     <div class="header-actions">
-      <div class="search-box">
-        <span>Search services and information</span>
-        <span class="search-icon">⌕</span>
-      </div>
-      <button class="btn btn-primary">Login / Sign Up</button>
+      <form class="search-box" role="search" action="./Template_AfterClick.html" method="get">
+        <input type="search" name="q" aria-label="Search CityLink services and information" placeholder="Search services and information">
+        <button type="submit" class="search-icon" aria-label="Submit search">⌕</button>
+      </form>
+      <button type="button" class="btn btn-primary">Login / Sign Up</button>
     </div>
   </header>
 
   
   <!-- Navigation -->
-  <nav class="site-nav">
-    <a href="#" class="nav-link">Home</a>
-    <a href="#" class="nav-link">Services</a>
-    <a href="#" class="nav-link">Announcements</a>
-    <a href="#" class="nav-link">Feedback</a>
-    <a href="#" class="nav-link">About</a>
+  <nav class="site-nav" aria-label="Primary navigation">
+    <a href="./Template_General.html" class="nav-link">Home</a>
+    <a href="./Template_General.html#quick-services" class="nav-link">Services</a>
+    <a href="./Template_General.html#announcements" class="nav-link">Announcements</a>
+    <a href="#form-template" class="nav-link active" aria-current="page">Feedback</a>
+    <a href="./Template_General.html#about-citylink" class="nav-link">About</a>
   </nav>
 
 <main id="main-content" tabindex="-1">
   
-  <section class="form-section">
-  <!-- 沿用 Most Used Section 的標題結構 -->
+  <section id="form-template" class="form-section" aria-labelledby="form-heading">
+  <!-- Reuse the section heading structure -->
   <div class="section-header">
     <span class="section-badge">Form Template</span>
-    <h2>Fill the Form</h2>
-    <p>descrition fo the form</p>
+    <h1 id="form-heading">Fill in the form</h1>
+    <p>Enter the requested information, then submit the form.</p>
   </div>
 
-  <!-- 表格卡片容器 -->
-  <div class="form-table-container">
+  <!-- Form table container -->
+  <form class="form-table-container" novalidate>
     <table class="form-table">
       <thead>
         <tr>
-          <th>Colume 1</th>
-          <th>Colume 2</th>
+          <th scope="col">Field</th>
+          <th scope="col">Response</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td>Title 1</td>
-          <td><input type="text"></td>
+          <td><label for="form-field-one">Title 1</label></td>
+          <td><input id="form-field-one" name="fieldOne" type="text" required></td>
         </tr>
         <tr>
-          <td>Title 2</td>
-          <td><input type="text"></td>
+          <td><label for="form-field-two">Title 2</label></td>
+          <td><input id="form-field-two" name="fieldTwo" type="text" required></td>
         </tr>
       </tbody>
     </table>
     <hr>
-    <button class="btn btn-primary">Submit</button>
-  </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
   
 </section>
   </main>
     <!-- Footer Section -->
   <footer class="site-footer">
-    <!-- 上方四欄導覽與資訊 -->
+    <!-- Four-column footer navigation and information -->
     <div class="footer-columns">
       
-      <!-- 欄位 1 -->
-      <div class="footer-col">
+      <!-- Footer column 1 -->
+      <div id="about-citylink" class="footer-col">
         <h3 class="footer-heading">CityLink Initiatives</h3>
         <p class="footer-text">Serving our community online and in person.</p>
       </div>
 
-      <!-- 欄位 2 -->
-      <div class="footer-col">
+      <!-- Footer column 2 -->
+      <div id="accessibility-information" class="footer-col">
         <h3 class="footer-heading">Useful links</h3>
-        <p class="footer-text">
-          Privacy Policy<br>
-          Accessibility<br>
-          Contact Us
-        </p>
+        <nav aria-label="Footer navigation">
+          <p class="footer-text">
+            <a href="./Template_AfterClick.html">Privacy Policy</a><br>
+            <a href="#accessibility-information">Accessibility</a><br>
+            <a href="#contact-citylink">Contact Us</a>
+          </p>
+        </nav>
       </div>
 
-      <!-- 欄位 3 -->
-      <div class="footer-col">
+      <!-- Footer column 3 -->
+      <div id="contact-citylink" class="footer-col">
         <h3 class="footer-heading">Visit or call</h3>
         <p class="footer-text">
-          About this Site<br>
-          (08) 9000 1234
+          <a href="#about-citylink">About this Site</a><br>
+          <a href="tel:+61890001234">(08) 9000 1234</a>
         </p>
       </div>
 
-      <!-- 欄位 4 -->
+      <!-- Footer column 4 -->
       <div class="footer-col">
         <h3 class="footer-heading">Follow us</h3>
         <p class="footer-text">
-          Acknowledgment of Country<br>
-          ● &nbsp;LinkedIn
+          <a href="./Template_AfterClick.html">Acknowledgment of Country</a><br>
+          <a href="./Template_AfterClick.html" aria-label="Visit CityLink on LinkedIn">LinkedIn</a>
         </p>
       </div>
 
     </div>
 
-    <!-- 下方版權聲明 -->
+    <!-- Copyright information -->
     <div class="footer-bottom">
       © 2026 CityLink Initiatives. All rights reserved.
     </div>
   </footer>
+  <script src="./script.js" defer></script>
 </body>
 </html>
 
