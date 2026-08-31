@@ -309,7 +309,9 @@ main {
 }
 
 .most-used-section,
+.service1-section,
 .stay-informed-section,
+.service2-section,
 .around-citylink-section {
   width: 100%;
   max-width: 1440px;
@@ -321,7 +323,8 @@ main {
   overflow: hidden;
 }
 
-.stay-informed-section {
+.stay-informed-section,
+.service2-section {
   background: var(--color-bg-light);
 }
 
@@ -564,7 +567,9 @@ main {
   .site-nav,
   .hero-section,
   .most-used-section,
+  .service1-section,
   .stay-informed-section,
+  .service2-section,
   .around-citylink-section,
   .form-section,
   .site-footer {
