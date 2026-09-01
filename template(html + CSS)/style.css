@@ -429,6 +429,7 @@ main {
 }
 
 /* Form Section 樣式 */
+.detail-section,
 .form-section {
   width: 100%;
   max-width: 1440px;
@@ -440,6 +441,7 @@ main {
   box-sizing: border-box;
 }
 
+.detail-section .btn,
 .form-section .btn {
   width: fit-content !important;
   align-self: flex-end;
@@ -572,6 +574,7 @@ main {
   .service2-section,
   .around-citylink-section,
   .form-section,
+  .detail-section,
   .site-footer {
     width: 100% !important;
     max-width: 100% !important;
