@@ -310,8 +310,12 @@ main {
 
 .most-used-section,
 .service1-section,
+.event1-section,
+.announcement1-section,
 .stay-informed-section,
 .service2-section,
+.event2-section,
+.announcement2-section,
 .around-citylink-section {
   width: 100%;
   max-width: 1440px;
@@ -324,6 +328,8 @@ main {
 }
 
 .stay-informed-section,
+.event2-section,
+.announcement2-section,
 .service2-section {
   background: var(--color-bg-light);
 }
@@ -441,6 +447,51 @@ main {
   box-sizing: border-box;
 }
 
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Announcement detail page */
+.announcement-detail { width: 100%; max-width: 1440px; padding: 48px 120px 72px; background: white; }
+.announcement-detail .breadcrumb { margin-bottom: 40px; color: var(--color-muted); font-size: 14px; }
+.announcement-detail .breadcrumb a,
+.announcement-body a,
+.announcement-sidebar a:not(.btn) { color: var(--color-primary); }
+.announcement-detail-header { max-width: 940px; }
+.announcement-detail-header h1 { margin: 12px 0 20px; color: var(--color-dark); font-size: 48px; line-height: 1.15; }
+.announcement-lead { color: var(--color-muted); font-size: 20px; line-height: 1.55; }
+.announcement-meta { display: flex; flex-wrap: wrap; gap: 24px 48px; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border-color); }
+.announcement-meta div { min-width: 170px; }
+.announcement-meta dt { margin-bottom: 6px; color: var(--color-muted); font-size: 13px; font-weight: 600; text-transform: uppercase; }
+.announcement-meta dd { margin: 0; color: var(--color-text); font-weight: 600; }
+.announcement-feature-image { margin: 40px 0 48px; }
+.announcement-feature-image img { display: block; width: 100%; max-height: 560px; object-fit: cover; border-radius: 12px; }
+.announcement-feature-image figcaption { margin-top: 10px; color: var(--color-muted); font-size: 13px; line-height: 1.5; }
+.announcement-layout { display: grid; grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr); gap: 64px; align-items: start; }
+.announcement-body { max-width: 760px; }
+.announcement-body p,
+.announcement-body li { color: var(--color-text); font-size: 17px; line-height: 1.75; }
+.announcement-body h2,
+.announcement-sidebar h2 { margin: 36px 0 12px; color: var(--color-dark); font-size: 24px; }
+.announcement-body > h2:first-of-type { margin-top: 28px; }
+.announcement-body ul { margin: 12px 0 24px 24px; }
+.announcement-body li + li { margin-top: 8px; }
+.announcement-notice { margin: 32px 0; padding: 24px; background: var(--color-accent); border-left: 5px solid var(--color-primary); border-radius: 4px; }
+.announcement-notice h2 { margin-top: 0; }
+.announcement-sidebar { display: flex; flex-direction: column; gap: 24px; }
+.announcement-contact-card,
+.announcement-update-card { padding: 28px; background: var(--color-bg-light); border: 1px solid var(--border-color); border-radius: 8px; }
+.announcement-contact-card h2,
+.announcement-update-card h2 { margin-top: 0; }
+.announcement-contact-card p,
+.announcement-update-card p { margin: 0 0 18px; color: var(--color-muted); line-height: 1.6; }
+.announcement-contact-card .btn { width: 100%; margin-top: 8px; }
+.announcement-update-card { background: white; }
+.announcement-detail-footer { margin-top: 56px; padding-top: 24px; border-top: 1px solid var(--border-color); }
+
 .detail-section .btn,
 .form-section .btn {
   width: fit-content !important;
@@ -498,7 +549,13 @@ main {
   background: #F7FAFA;
 }
 
-.form-table input[type="text"] {
+.form-table input[type="text"],
+.form-table input[type="email"],
+.form-table input[type="password"],
+.form-table input[type="tel"],
+.form-table input[type="date"],
+.form-table select,
+.form-table textarea {
   width: 100%;
   min-width: 140px;
   height: 40px;
@@ -507,6 +564,13 @@ main {
   border-radius: 4px;
   font-family: var(--font-main);
   font-size: 14px;
+}
+
+.form-table textarea {
+  height: auto;
+  min-height: 140px;
+  padding: 12px;
+  resize: vertical;
 }
 
 /* ========================================== */
@@ -564,14 +628,25 @@ main {
 /* 7. 手機版響應式調整 (螢幕小於 768px)       */
 /* ========================================== */
 @media screen and (max-width: 768px) {
+  .announcement-detail { padding: 32px 16px 48px; }
+  .announcement-detail-header h1 { font-size: 34px; }
+  .announcement-lead { font-size: 18px; }
+  .announcement-meta { flex-direction: column; gap: 18px; }
+  .announcement-feature-image { margin: 32px 0; }
+  .announcement-feature-image img { min-height: 240px; }
+  .announcement-layout { grid-template-columns: 1fr; gap: 40px; }
   .top-bar,
   .site-header,
   .site-nav,
   .hero-section,
   .most-used-section,
   .service1-section,
+  .event1-section,
+  .announcement1-section,
   .stay-informed-section,
   .service2-section,
+  .event2-section,
+  .announcement2-section,
   .around-citylink-section,
   .form-section,
   .detail-section,
@@ -650,12 +725,23 @@ main {
     font-size: 14px;
   }
 
-  .form-table input[type="text"] {
+  .form-table input[type="text"],
+  .form-table input[type="email"],
+  .form-table input[type="password"],
+  .form-table input[type="tel"],
+  .form-table input[type="date"],
+  .form-table select,
+  .form-table textarea {
     width: 100% !important;
     min-width: 120px;
     height: 38px;
     padding: 0 10px;
     font-size: 14px;
+  }
+
+  .form-table textarea {
+    height: auto;
+    min-height: 120px;
   }
 
   .footer-columns {
