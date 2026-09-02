@@ -82,13 +82,13 @@ document.addEventListener("DOMContentLoaded", () => {
   if (formContainer) {
     const inputs = [...formContainer.querySelectorAll('input[type="text"]')];
 
-    // Check that every text field has a value before submission.
+    // Check text fields that are explicitly marked as required.
     formContainer.addEventListener("submit", (event) => {
       event.preventDefault();
       let firstInvalidInput = null;
 
       inputs.forEach((input) => {
-        const isEmpty = input.value.trim() === "";
+        const isEmpty = input.required && input.value.trim() === "";
         input.setAttribute("aria-invalid", String(isEmpty));
 
         if (isEmpty && !firstInvalidInput) {
