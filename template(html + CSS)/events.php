@@ -34,7 +34,7 @@ showHeader('Events', 'events');
         <p class="announcement-date"><time datetime="2026-09-12T10:00">Saturday 12 September, 10 am–3 pm</time></p>
         <p class="card-desc"><strong>Civic Square</strong> · Free entry</p>
         <p class="card-desc">Enjoy local food stalls, live performances, children's activities and information from community organisations.</p>
-        <a href="./event-detail.php" class="card-link">View event and accessibility details &rarr;</a>
+        <a href="./event-detail.php" class="card-link">View event details &rarr;</a>
       </article>
     </div>
   </section>
@@ -54,7 +54,7 @@ showHeader('Events', 'events');
         <p class="announcement-date"><time datetime="2026-09-17T18:00">Thursday 17 September, 6–7:30 pm</time></p>
         <p class="card-desc"><strong>Riverside Library meeting room</strong> · $5 per person</p>
         <p class="card-desc">Learn how to choose a compost system, balance food and garden waste and prevent common composting problems.</p>
-        <a href="./booking.php" class="card-link">Book a workshop place &rarr;</a>
+        <a href="./booking.php" class="card-link">View event details &rarr;</a>
       </article>
     </div>
   </section>
@@ -64,7 +64,7 @@ showHeader('Events', 'events');
     <!-- Section heading -->
     <div class="section-header">
       <span class="section-badge">COMMUNITY WELLBEING</span>
-      <h2 id="event-3-heading">Seniors digital help drop-in</h2>
+      <h2 id="event-3-heading">View event details</h2>
     </div>
 
     <!-- Service card grid -->
