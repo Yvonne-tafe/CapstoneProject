@@ -71,6 +71,7 @@ showHeader('Services', 'services');
       <article class="service-card">
         <p class="card-desc">Discover local workshops, youth programs, support groups and spaces available for community hire.</p>
         <p class="card-desc"><strong>Bookings:</strong> select an activity or venue to check availability before submitting a request.</p>
+        <a href="./community-programs.php" class="card-link">Browse community programs &rarr;</a>
         <a href="./events.php" class="card-link">Browse community events &rarr;</a>
         <a href="./booking.php" class="card-link">Start a facility booking &rarr;</a>
       </article>
