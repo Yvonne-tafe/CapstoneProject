@@ -42,8 +42,8 @@ function showHeader($pageTitle = 'CityLink', $activePage = '')
   <div class="top-bar">
     <div class="container-inner">
       <span><a href="#main-content" class="skip-link">Skip To Main Content</a></span>
-      <span> &nbsp;|&nbsp; <a href="./accessibility.html" class="top-bar-link">Accessibility</a></span>
-      <span> &nbsp;|&nbsp; <a href="./contact.html" class="top-bar-link">Contact</a></span>
+      <span> &nbsp;|&nbsp; <a href="./accessibility.php" class="top-bar-link">Accessibility</a></span>
+      <span> &nbsp;|&nbsp; <a href="./contact.php" class="top-bar-link">Contact</a></span>
     </div>
   </div>
 
@@ -57,26 +57,60 @@ function showHeader($pageTitle = 'CityLink', $activePage = '')
       </div>
     </div>
     <div class="header-actions">
-      <form class="search-box" role="search" action="./search.html" method="get">
+      <form class="search-box" role="search" action="./search.php" method="get">
         <input type="search" name="q" aria-label="Search CityLink services and information" placeholder="Search services and information">
         <button type="submit" class="search-icon" aria-label="Submit search">⌕</button>
       </form>
-      <a href="./login.html" class="btn btn-primary">Login / Sign Up</a>
+      <a href="./login.php" class="btn btn-primary">Login / Sign Up</a>
     </div>
   </header>
 
   
   <!-- Navigation -->
   <nav class="site-nav" aria-label="Primary navigation">
-    <a href="./index.html" class="nav-link<?= $activePage === 'home' ? ' active' : '' ?>"<?= $activePage === 'home' ? ' aria-current="page"' : '' ?>>Home</a>
-    <a href="./services.html" class="nav-link<?= $activePage === 'services' ? ' active' : '' ?>"<?= $activePage === 'services' ? ' aria-current="page"' : '' ?>>Services</a>
-    <a href="./services.html" class="nav-link<?= $activePage === 'events' ? ' active' : '' ?>"<?= $activePage === 'events' ? ' aria-current="page"' : '' ?>>Events</a>
-    <a href="./announcements.html" class="nav-link<?= $activePage === 'announcements' ? ' active' : '' ?>"<?= $activePage === 'announcements' ? ' aria-current="page"' : '' ?>>Announcements</a>
-    <a href="./feedback.html" class="nav-link<?= $activePage === 'feedback' ? ' active' : '' ?>"<?= $activePage === 'feedback' ? ' aria-current="page"' : '' ?>>Feedback</a>
-    <a href="./about.html" class="nav-link<?= $activePage === 'about' ? ' active' : '' ?>"<?= $activePage === 'about' ? ' aria-current="page"' : '' ?>>About</a>
+    <a href="./index.php" class="nav-link<?= $activePage === 'home' ? ' active' : '' ?>"<?= $activePage === 'home' ? ' aria-current="page"' : '' ?>>Home</a>
+    <a href="./services.php" class="nav-link<?= $activePage === 'services' ? ' active' : '' ?>"<?= $activePage === 'services' ? ' aria-current="page"' : '' ?>>Services</a>
+    <a href="./events.php" class="nav-link<?= $activePage === 'events' ? ' active' : '' ?>"<?= $activePage === 'events' ? ' aria-current="page"' : '' ?>>Events</a>
+    <a href="./announcements.php" class="nav-link<?= $activePage === 'announcements' ? ' active' : '' ?>"<?= $activePage === 'announcements' ? ' aria-current="page"' : '' ?>>Announcements</a>
+    <a href="./feedback.php" class="nav-link<?= $activePage === 'feedback' ? ' active' : '' ?>"<?= $activePage === 'feedback' ? ' aria-current="page"' : '' ?>>Feedback</a>
+    <a href="./about.php" class="nav-link<?= $activePage === 'about' ? ' active' : '' ?>"<?= $activePage === 'about' ? ' aria-current="page"' : '' ?>>About</a>
   </nav>
 
 <main id="main-content" tabindex="-1">
+<?php
+}
+
+/**
+ * Show a breadcrumb path. Home is added automatically.
+ *
+ * Example:
+ * showBreadcrumb([
+ *     'Announcements' => './announcements.php',
+ *     'Community centre renewal works' => null
+ * ]);
+ *
+ * Use null for the current (final) page. More parent levels can be added
+ * without changing this function.
+ */
+function showBreadcrumb($items = [])
+{
+    $path = array_merge(['Home' => './index.php'], $items);
+    $labels = array_keys($path);
+    $firstLabel = $labels[0];
+    $lastLabel = $labels[count($labels) - 1];
+?>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+<?php foreach ($path as $label => $url): ?>
+<?php if ($label !== $firstLabel): ?>
+    <span aria-hidden="true">/</span>
+<?php endif; ?>
+<?php if ($label === $lastLabel || $url === null): ?>
+    <span aria-current="page"><?= htmlspecialchars($label, ENT_QUOTES, 'UTF-8') ?></span>
+<?php else: ?>
+    <a href="<?= htmlspecialchars($url, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($label, ENT_QUOTES, 'UTF-8') ?></a>
+<?php endif; ?>
+<?php endforeach; ?>
+  </nav>
 <?php
 }
 
@@ -99,9 +133,9 @@ function showFooter()
         <h3 class="footer-heading">Useful links</h3>
         <nav aria-label="Footer navigation">
           <p class="footer-text">
-            <a href="./privacy.html">Privacy Policy</a><br>
-            <a href="./accessibility.html">Accessibility</a><br>
-            <a href="./contact.html">Contact Us</a>
+            <a href="./privacy.php">Privacy Policy</a><br>
+            <a href="./accessibility.php">Accessibility</a><br>
+            <a href="./contact.php">Contact Us</a>
           </p>
         </nav>
       </div>
@@ -110,7 +144,7 @@ function showFooter()
       <div id="contact-citylink" class="footer-col">
         <h3 class="footer-heading">Visit or call</h3>
         <p class="footer-text">
-          <a href="./about.html">About this Site</a><br>
+          <a href="./about.php">About this Site</a><br>
           <a href="tel:+61890001234">(08) 9000 1234</a>
         </p>
       </div>
@@ -119,7 +153,7 @@ function showFooter()
       <div class="footer-col">
         <h3 class="footer-heading">Follow us</h3>
         <p class="footer-text">
-          <a href="./acknowledgement.html">Acknowledgment of Country</a><br>
+          <a href="./acknowledgement.php">Acknowledgment of Country</a><br>
           <!-- Add the real CityLink LinkedIn URL when available. -->
           <span>LinkedIn (coming soon)</span>
         </p>
@@ -137,3 +171,4 @@ function showFooter()
 </html>
 <?php
 }
+
