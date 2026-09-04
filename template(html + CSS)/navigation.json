@@ -1,0 +1,10 @@
+{
+  "navigation": [
+    { "label": "Home", "url": "./index.php", "key": "home" },
+    { "label": "Services", "url": "./services.php", "key": "services" },
+    { "label": "Events", "url": "./events.php", "key": "events" },
+    { "label": "Announcements", "url": "./announcements.php", "key": "announcements" },
+    { "label": "Feedback", "url": "./feedback.php", "key": "feedback" },
+    { "label": "About", "url": "./about.php", "key": "about" }
+  ]
+}

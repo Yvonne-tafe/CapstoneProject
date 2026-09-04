@@ -65,16 +65,25 @@ function showHeader($pageTitle = 'CityLink', $activePage = '')
     </div>
   </header>
 
-  
-  <!-- Navigation -->
+  <!-- read navigtion from a Json file -->
   <nav class="site-nav" aria-label="Primary navigation">
-    <a href="./index.php" class="nav-link<?= $activePage === 'home' ? ' active' : '' ?>"<?= $activePage === 'home' ? ' aria-current="page"' : '' ?>>Home</a>
-    <a href="./services.php" class="nav-link<?= $activePage === 'services' ? ' active' : '' ?>"<?= $activePage === 'services' ? ' aria-current="page"' : '' ?>>Services</a>
-    <a href="./events.php" class="nav-link<?= $activePage === 'events' ? ' active' : '' ?>"<?= $activePage === 'events' ? ' aria-current="page"' : '' ?>>Events</a>
-    <a href="./announcements.php" class="nav-link<?= $activePage === 'announcements' ? ' active' : '' ?>"<?= $activePage === 'announcements' ? ' aria-current="page"' : '' ?>>Announcements</a>
-    <a href="./feedback.php" class="nav-link<?= $activePage === 'feedback' ? ' active' : '' ?>"<?= $activePage === 'feedback' ? ' aria-current="page"' : '' ?>>Feedback</a>
-    <a href="./about.php" class="nav-link<?= $activePage === 'about' ? ' active' : '' ?>"<?= $activePage === 'about' ? ' aria-current="page"' : '' ?>>About</a>
-  </nav>
+  <?php
+    $jsonFile = __DIR__ . '/navigation.json';
+    $menuData = file_exists($jsonFile) ? json_decode(file_get_contents($jsonFile), true) : ['navigation' => []];
+    $currentPath = basename($_SERVER['PHP_SELF']);
+  ?>
+  <!-- if there is any issue, do Not display the navigation bar -->
+  <?php if (!empty($menuData['navigation']) && is_array($menuData['navigation'])): ?>
+  <?php foreach ($menuData['navigation'] as $item): ?>
+        <?php 
+            $isActive = (basename($item['url']) === $currentPath);
+            $activeClass = $isActive ? ' active' : '';
+            $ariaCurrent = $isActive ? ' aria-current="page"' : '';
+        ?>
+        <a href="<?= htmlspecialchars($item['url']) ?>" class="nav-link<?= $activeClass ?>"<?= $ariaCurrent ?>><?= htmlspecialchars($item['label']) ?></a>
+    <?php endforeach; ?>
+  <?php endif; ?>
+</nav>
 
 <main id="main-content" tabindex="-1">
 <?php
