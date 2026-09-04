@@ -64,15 +64,16 @@ function showHeader($pageTitle = 'CityLink', $activePage = '')
       <a href="./login.php" class="btn btn-primary">Login / Sign Up</a>
     </div>
   </header>
-
-  <!-- read navigtion from a Json file -->
+  
+   <!-- Navigation bar -->
   <nav class="site-nav" aria-label="Primary navigation">
   <?php
+    //read navigtion from a Json file
     $jsonFile = __DIR__ . '/navigation.json';
     $menuData = file_exists($jsonFile) ? json_decode(file_get_contents($jsonFile), true) : ['navigation' => []];
     $currentPath = basename($_SERVER['PHP_SELF']);
   ?>
-  <!-- if there is any issue, do Not display the navigation bar -->
+  <?php //if there is any issue, do Not display the navigation bar ?>
   <?php if (!empty($menuData['navigation']) && is_array($menuData['navigation'])): ?>
   <?php foreach ($menuData['navigation'] as $item): ?>
         <?php 
