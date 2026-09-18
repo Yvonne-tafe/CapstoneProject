@@ -44,7 +44,7 @@ showHeader('Accessibility', 'accessibility');
     <span class="section-badge">REPORT A PROBLEM</span>
     <h2>Tell us about an accessibility issue</h2>
     <p>If you cannot access information or complete a task, contact CityLink and describe the page, the problem and the format you need. We will try to provide the information in an accessible alternative.</p>
-    <a href="./contact.html" class="card-link">Contact CityLink about accessibility &rarr;</a>
+    <a href="./contact.php" class="card-link">Contact CityLink about accessibility &rarr;</a>
   </div>
 </section>
 
