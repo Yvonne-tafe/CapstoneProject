@@ -64,17 +64,27 @@ function showHeader($pageTitle = 'CityLink', $activePage = '')
       <a href="./login.php" class="btn btn-primary">Login / Sign Up</a>
     </div>
   </header>
-
   
-  <!-- Navigation -->
+   <!-- Navigation bar -->
   <nav class="site-nav" aria-label="Primary navigation">
-    <a href="./index.php" class="nav-link<?= $activePage === 'home' ? ' active' : '' ?>"<?= $activePage === 'home' ? ' aria-current="page"' : '' ?>>Home</a>
-    <a href="./services.php" class="nav-link<?= $activePage === 'services' ? ' active' : '' ?>"<?= $activePage === 'services' ? ' aria-current="page"' : '' ?>>Services</a>
-    <a href="./events.php" class="nav-link<?= $activePage === 'events' ? ' active' : '' ?>"<?= $activePage === 'events' ? ' aria-current="page"' : '' ?>>Events</a>
-    <a href="./announcements.php" class="nav-link<?= $activePage === 'announcements' ? ' active' : '' ?>"<?= $activePage === 'announcements' ? ' aria-current="page"' : '' ?>>Announcements</a>
-    <a href="./feedback.php" class="nav-link<?= $activePage === 'feedback' ? ' active' : '' ?>"<?= $activePage === 'feedback' ? ' aria-current="page"' : '' ?>>Feedback</a>
-    <a href="./about.php" class="nav-link<?= $activePage === 'about' ? ' active' : '' ?>"<?= $activePage === 'about' ? ' aria-current="page"' : '' ?>>About</a>
-  </nav>
+  <?php
+    //read navigtion from a Json file
+    $jsonFile = __DIR__ . '/navigation.json';
+    $menuData = file_exists($jsonFile) ? json_decode(file_get_contents($jsonFile), true) : ['navigation' => []];
+    $currentPath = basename($_SERVER['PHP_SELF']);
+  ?>
+  <?php //if there is any issue, do Not display the navigation bar ?>
+  <?php if (!empty($menuData['navigation']) && is_array($menuData['navigation'])): ?>
+  <?php foreach ($menuData['navigation'] as $item): ?>
+        <?php 
+            $isActive = (basename($item['url']) === $currentPath);
+            $activeClass = $isActive ? ' active' : '';
+            $ariaCurrent = $isActive ? ' aria-current="page"' : '';
+        ?>
+        <a href="<?= htmlspecialchars($item['url']) ?>" class="nav-link<?= $activeClass ?>"<?= $ariaCurrent ?>><?= htmlspecialchars($item['label']) ?></a>
+    <?php endforeach; ?>
+  <?php endif; ?>
+</nav>
 
 <main id="main-content" tabindex="-1">
 <?php
@@ -118,54 +128,76 @@ function showFooter()
 {
 ?>
 </main><!-- Footer Section -->
-  <footer class="site-footer">
-    <!-- Four-column footer navigation and information -->
+  
+<?php
+// Read navigation from a JSON file
+$jsonFile = __DIR__ . '/footer.json';
+$data = file_exists($jsonFile) ? json_decode(file_get_contents($jsonFile), true) : null;
+$columns = (isset($data['main-navigation']) && is_array($data['main-navigation'])) ? $data['main-navigation'] : [];
+
+// Map column headings to their specific IDs used in the original HTML
+$columnIds = [
+    "CityLink Initiatives" => "about-citylink",
+    "Useful links" => "accessibility-information",
+    "Visit or call" => "contact-citylink"
+];
+?>
+<footer class="site-footer">
     <div class="footer-columns">
-      
-      <!-- Footer column 1 -->
-      <div id="about-citylink" class="footer-col">
-        <h3 class="footer-heading">CityLink Initiatives</h3>
-        <p class="footer-text">Serving our community online and in person.</p>
-      </div>
-
-      <!-- Footer column 2 -->
-      <div id="accessibility-information" class="footer-col">
-        <h3 class="footer-heading">Useful links</h3>
-        <nav aria-label="Footer navigation">
-          <p class="footer-text">
-            <a href="./privacy.php">Privacy Policy</a><br>
-            <a href="./accessibility.php">Accessibility</a><br>
-            <a href="./contact.php">Contact Us</a>
-          </p>
-        </nav>
-      </div>
-
-      <!-- Footer column 3 -->
-      <div id="contact-citylink" class="footer-col">
-        <h3 class="footer-heading">Visit or call</h3>
-        <p class="footer-text">
-          <a href="./about.php">About this Site</a><br>
-          <a href="tel:+61890001234">(08) 9000 1234</a>
-        </p>
-      </div>
-
-      <!-- Footer column 4 -->
-      <div class="footer-col">
-        <h3 class="footer-heading">Follow us</h3>
-        <p class="footer-text">
-          <a href="./acknowledgement.php">Acknowledgment of Country</a><br>
-          <!-- Add the real CityLink LinkedIn URL when available. -->
-          <span>LinkedIn (coming soon)</span>
-        </p>
-      </div>
-
+        <?php foreach ($columns as $col): 
+            // Handle different key naming conventions ("main-label" vs others)
+            $titleKey = isset($col['main-label']) ? 'main-label' : key($col);
+            $title = isset($col[$titleKey]) ? $col[$titleKey] : '';
+            
+            // Assign ID if defined in mapping
+            $idAttr = isset($columnIds[$title]) ? ' id="' . $columnIds[$title] . '"' : '';
+        ?>
+            <div<?= $idAttr ?> class="footer-col">
+                <h3 class="footer-heading"><?= htmlspecialchars($title) ?></h3>
+                
+                <?php if (isset($col['navigation']['label'])): ?>
+                    <!-- Single content block (Column 1) -->
+                    <p class="footer-text"><?= htmlspecialchars($col['navigation']['label']) ?></p>
+                <?php else: ?>
+                    <!-- Multi-item navigation block (Columns 2, 3, 4) -->
+                    <?php if ($title === "Useful links"): ?>
+                    <nav aria-label="Footer navigation">
+                    <?php endif; ?>
+                    
+                        <p class="footer-text">
+                            <?php 
+                            $navItems = (isset($col['navigation']) && is_array($col['navigation'])) ? $col['navigation'] : [];
+                            $total = count($navItems);
+                            foreach ($navItems as $i => $item):
+                                $url = isset($item['url']) ? $item['url'] : '';
+                                $label = isset($item['label']) ? htmlspecialchars($item['label']) : '';
+                                
+                                if (!empty($url)) {
+                                    echo '<a href="' . htmlspecialchars($url) . '">' . $label . '</a>';
+                                } else {
+                                    echo '<span>' . $label . '</span>';
+                                }
+                                
+                                if ($i < $total - 1) {
+                                    echo "<br>\n";
+                                }
+                            endforeach; 
+                            ?>
+                        </p>
+                        
+                    <?php if ($title === "Useful links"): ?>
+                    </nav>
+                    <?php endif; ?>
+                    
+                <?php endif; ?>
+            </div>
+        <?php endforeach; ?>
     </div>
 
-    <!-- Copyright information -->
     <div class="footer-bottom">
-      © 2026 CityLink Initiatives. All rights reserved.
+        &copy; 2026 CityLink Initiatives. All rights reserved.
     </div>
-  </footer>
+</footer>
   <script src="./script.js" defer></script>
 </body>
 </html>

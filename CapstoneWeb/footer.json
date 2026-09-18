@@ -1,0 +1,18 @@
+{
+  "main-navigation": [
+    { "main-label": "CityLink Initiativessssss", "navigation": { "label": "Serving our community online and in person.", "url": "", "key": "Servingourcommunityonlineandinperson" }},
+    { "main-label": "Useful links", "navigation": [
+      { "label": "Privacy Policy", "url": "./privacy.php", "key": "privacy" },
+      { "label": "Accessibility", "url": "./accessibility.php", "key": "accessibility"},
+      { "label": "Contact Us", "url": "./contact.php", "key": "contact" }]
+    },
+    { "main-label": "Visit or call", "navigation": [
+      { "label": "About this Site", "url": "./about.php", "key": "about" },
+      { "label": "(08) 9000 1234", "url": "tel:+61890001234", "key": "tel" }]
+    },
+    { "Follow us": "Visit or call", "navigation": [
+      { "label": "Acknowledgment of Country", "url": "./acknowledgment.php", "key": "acknowledgment" },
+      { "label": "LinkedIn (coming soon)", "url": "", "key": "LinkedIn" }]
+    }
+  ]
+}
