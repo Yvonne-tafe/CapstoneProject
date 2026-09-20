@@ -11,7 +11,7 @@
       { "label": "(08) 9000 1234", "url": "tel:+61890001234", "key": "tel" }]
     },
     { "Follow us": "Visit or call", "navigation": [
-      { "label": "Acknowledgment of Country", "url": "./acknowledgment.php", "key": "acknowledgment" },
+      { "label": "Acknowledgment of Country", "url": "./acknowledgement.php", "key": "acknowledgement" },
       { "label": "LinkedIn (coming soon)", "url": "", "key": "LinkedIn" }]
     }
   ]

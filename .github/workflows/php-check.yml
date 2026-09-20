@@ -1,0 +1,37 @@
+name: PHP Syntax Check
+
+on:
+  push:
+    branches:
+      - main
+      - "feature/**"
+
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  php-syntax-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download repository
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "5.4"
+          extensions: pdo, pdo_mysql
+          tools: none
+
+      - name: Show PHP version
+        run: php -v
+
+      - name: Check PHP syntax
+        run: |
+          find CapstoneWeb -type f -name "*.php" -print0 |
+          while IFS= read -r -d '' file; do
+            echo "Checking $file"
+            php -l "$file" || exit 1
+          done
