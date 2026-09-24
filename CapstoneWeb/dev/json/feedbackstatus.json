@@ -1,0 +1,22 @@
+[
+  {
+    "feedback_status_id": 1,
+    "feedback_status_name": "New",
+    "feedback_status_desc": "The feedback has been received and processing has not started."
+  },
+  {
+    "feedback_status_id": 2,
+    "feedback_status_name": "In Progress",
+    "feedback_status_desc": "The feedback is being reviewed or addressed."
+  },
+  {
+    "feedback_status_id": 3,
+    "feedback_status_name": "Resolved",
+    "feedback_status_desc": "Processing is complete and a resolution has been recorded."
+  },
+  {
+    "feedback_status_id": 4,
+    "feedback_status_name": "Closed",
+    "feedback_status_desc": "No further action is required. The record may be closed after resolution or without resolution, such as for duplicate or spam submissions."
+  }
+]

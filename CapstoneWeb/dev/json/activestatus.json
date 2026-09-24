@@ -1,0 +1,12 @@
+[
+  {
+    "active_status_id": 1,
+    "active_status_name": "Active",
+    "active_status_desc": "The record is enabled and available for use."
+  },
+  {
+    "active_status_id": 2,
+    "active_status_name": "Inactive",
+    "active_status_desc": "The record is disabled but retained for historical data and relationships."
+  }
+]
