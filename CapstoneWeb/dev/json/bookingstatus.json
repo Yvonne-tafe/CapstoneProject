@@ -1,0 +1,17 @@
+[
+  {
+    "booking_status_id": 1,
+    "booking_status_name": "Pending",
+    "booking_status_desc": "The booking has been submitted and is awaiting confirmation."
+  },
+  {
+    "booking_status_id": 2,
+    "booking_status_name": "Confirmed",
+    "booking_status_desc": "The booking is confirmed and reserves one participant place."
+  },
+  {
+    "booking_status_id": 3,
+    "booking_status_name": "Cancelled",
+    "booking_status_desc": "The booking is cancelled and does not reserve a participant place."
+  }
+]

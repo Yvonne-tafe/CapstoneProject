@@ -1,0 +1,47 @@
+[
+  {
+    "service_type_id": 1,
+    "service_type_name": "Program",
+    "service_type_quick_desc": "Structured activity courses",
+    "service_type_short_desc": "Ongoing or multi-week courses and community workshops designed for skill-building.",
+    "service_type_desc": "Comprehensive community programs scheduled across several weeks or recurrent sessions, including fitness, digital skills, and educational courses.",
+    "service_type_note": "Includes recurring community development programs.",
+    "active_status_id": 1
+  },
+  {
+    "service_type_id": 2,
+    "service_type_name": "Event",
+    "service_type_quick_desc": "One-off public gatherings",
+    "service_type_short_desc": "Special community events, festivals, exhibitions, and public celebrations.",
+    "service_type_desc": "One-time or periodic public events organized by the council or local partners, offering cultural, social, and recreational experiences.",
+    "service_type_note": "Covers both free and ticketed community events.",
+    "active_status_id": 1
+  },
+  {
+    "service_type_id": 3,
+    "service_type_name": "Service",
+    "service_type_quick_desc": "Essential council services",
+    "service_type_short_desc": "Regular municipal and citizen services available to residents and businesses.",
+    "service_type_desc": "Direct council assistance, advisory sessions, consultations, and day-to-day community support services.",
+    "service_type_note": "Core operational and citizen support services.",
+    "active_status_id": 1
+  },
+  {
+    "service_type_id": 4,
+    "service_type_name": "Facility",
+    "service_type_quick_desc": "Spaces and venue hire",
+    "service_type_short_desc": "Community halls, rooms, and recreational spaces available for booking.",
+    "service_type_desc": "Publicly accessible municipal facilities, function rooms, and sports amenities available for community group or private bookings.",
+    "service_type_note": "Linked conceptually to physical community venues.",
+    "active_status_id": 1
+  },
+  {
+    "service_type_id": 5,
+    "service_type_name": "Other",
+    "service_type_quick_desc": "General activities",
+    "service_type_short_desc": "Miscellaneous activities and council initiatives not covered under other types.",
+    "service_type_desc": "Ad-hoc community engagements, seasonal promotions, and special interest activities.",
+    "service_type_note": "Fallback category for unclassified services.",
+    "active_status_id": 1
+  }
+]

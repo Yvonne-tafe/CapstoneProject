@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/config/feedback_data.php';
+$feedbackData=feedbackPageData();
 require_once __DIR__ . '/layout.php';
 showHeader('Feedback', 'feedback');
 ?>
@@ -14,7 +16,12 @@ showHeader('Feedback', 'feedback');
     <p>Your comments help CityLink improve its services and website. Fields marked required must be completed.</p>
   </div>
 
-  <form class="form-table-container" method="post" action="">
+  <?php authErrors($feedbackData['errors']); ?>
+  <?php if ($feedbackData['success']): ?><div class="booking-notice" role="status"><h2>Your feedback has been received</h2><p>Reference: <strong><?= serviceEscape($feedbackData['success']) ?></strong> · Status: New</p></div><?php endif; ?>
+  <?php if (!$feedbackData['success']): ?>
+  <form id="member-feedback" class="form-table-container" method="post" action="./feedback.php">
+    <input type="hidden" name="csrf_token" value="<?= serviceEscape(authToken()) ?>">
+    <input type="hidden" name="form_token" value="<?= serviceEscape($feedbackData['form_token']) ?>">
     <table class="form-table">
       <thead>
         <tr>
@@ -28,37 +35,33 @@ showHeader('Feedback', 'feedback');
           <td>
             <select id="feedback-type" name="feedback_type" required>
               <option value="">Select an option</option>
-              <option value="compliment">Compliment</option>
-              <option value="suggestion">Suggestion</option>
-              <option value="complaint">Complaint</option>
-              <option value="website">Website issue</option>
-              <option value="other">Other</option>
+              <?php foreach ($feedbackData['categories'] as $category): ?><option value="<?= (int)$category['feedback_category_id'] ?>"<?= $feedbackData['values']['feedback_type']===(string)$category['feedback_category_id']?' selected':'' ?>><?= serviceEscape($category['feedback_category_name']) ?></option><?php endforeach; ?>
             </select>
           </td>
         </tr>
         <tr>
           <th scope="row"><label for="subject">Subject (required)</label></th>
           <td>
-            <input type="text" id="subject" name="subject" required>
+            <input type="text" id="subject" name="subject" maxlength="150" value="<?= serviceEscape($feedbackData['values']['subject']) ?>" required>
           </td>
         </tr>
         <tr>
           <th scope="row"><label for="message">Your feedback (required)</label></th>
           <td>
-            <textarea id="message" name="message" rows="7" maxlength="2000" aria-describedby="message-help" required></textarea>
+            <textarea id="message" name="message" rows="7" maxlength="2000" aria-describedby="message-help" required><?= serviceEscape($feedbackData['values']['message']) ?></textarea>
             <p id="message-help">Describe what happened, the service involved and what you would like us to consider. Do not include passwords or payment details.</p>
           </td>
         </tr>
         <tr>
           <th scope="row"><label for="full-name">Your name (optional)</label></th>
           <td>
-            <input type="text" id="full-name" name="full_name" autocomplete="name">
+            <input type="text" id="full-name" name="full_name" maxlength="150" value="<?= serviceEscape($feedbackData['values']['full_name']) ?>" autocomplete="name">
           </td>
         </tr>
         <tr>
-          <th scope="row"><label for="email">Email address (optional)</label></th>
+          <th scope="row"><label for="email">Email address (required when requesting a response)</label></th>
           <td>
-            <input type="email" id="email" name="email" autocomplete="email">
+            <input type="email" id="email" name="email" <?= $feedbackData['values']['response_requested']==='yes'?'required':'' ?> maxlength="254" value="<?= serviceEscape($feedbackData['values']['email']) ?>" autocomplete="email">
             <p>Provide an email address if you would like CityLink to respond.</p>
           </td>
         </tr>
@@ -66,7 +69,7 @@ showHeader('Feedback', 'feedback');
           <th scope="row">Response requested</th>
           <td>
             <label for="response-requested">
-              <input type="checkbox" id="response-requested" name="response_requested" value="yes">
+              <input type="checkbox" id="response-requested" name="response_requested" value="yes" <?= $feedbackData['values']['response_requested']==='yes'?'checked':'' ?>>
               I would like CityLink to contact me about this feedback.
             </label>
           </td>
@@ -78,6 +81,10 @@ showHeader('Feedback', 'feedback');
     <button type="submit" class="btn btn-primary">Submit feedback</button>
     <p>Personal information included with your feedback will be handled according to our <a href="./privacy.php">Privacy Policy</a>.</p>
   </form>
+  <?php else: ?>
+    <p><a class="btn btn-primary" href="./feedback.php?new=1">Submit more feedback</a></p>
+    <p><a class="card-link" href="./account.php">View my account</a> · <a class="card-link" href="./index.php">Return to home</a></p>
+  <?php endif; ?>
 
   <div class="section-header">
     <span class="section-badge">Other ways to respond</span>

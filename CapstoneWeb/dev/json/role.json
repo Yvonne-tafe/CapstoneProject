@@ -1,0 +1,14 @@
+[
+  {
+    "role_id": 1,
+    "role_name": "general_user",
+    "role_desc": "A registered user who can manage their own account and make bookings.",
+    "role_note": null
+  },
+  {
+    "role_id": 2,
+    "role_name": "admin",
+    "role_desc": "An administrator who can manage website data and administrative functions.",
+    "role_note": null
+  }
+]

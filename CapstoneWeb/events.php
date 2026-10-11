@@ -1,5 +1,18 @@
 <?php
+// 列表入口與版面：由 show_list.php 取得 JSON，再填入下方 HTML。
+// 資料庫查詢仍集中在 show_list.php，這個檔案不包含 SQL。
+require_once __DIR__ . '/includes/show_list.php';
+$listResult = loadServiceListJson(isset($_GET['page']) ? $_GET['page'] : null, 'Event');
+http_response_code($listResult['status']);
+$listJson = $listResult['json'];
 require_once __DIR__ . '/layout.php';
+if (!function_exists('listEscape')) {
+    function listEscape($value) { return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8'); }
+}
+$listData = json_decode($listJson, true);
+$services = $listData['services'];
+$pagination = $listData['pagination'];
+$error = $listData['error'];
 showHeader('Events', 'events');
 ?>
  <!-- Hero Section -->
@@ -18,66 +31,34 @@ showHeader('Events', 'events');
     </div>
   </section>
 
-  <!-- TODO: use php to read database, and fill data into Event Section -->
-  <!-- Service Section -->
-  <section id="event-1" class="event1-section" aria-labelledby="event-1-heading">
-    <!-- Section heading -->
-    <div class="section-header">
-      <span class="section-badge">FAMILY EVENT</span>
-      <h2 id="event-1-heading">Neighbourhood Spring Fair</h2>
-    </div>
 
-    <!-- Service card grid -->
-    <div class="cards-grid">
-      <!-- Service card 1 -->
-      <article class="service-card">
-        <p class="announcement-date"><time datetime="2026-09-12T10:00">Saturday 12 September, 10 am–3 pm</time></p>
-        <p class="card-desc"><strong>Civic Square</strong> · Free entry</p>
-        <p class="card-desc">Enjoy local food stalls, live performances, children's activities and information from community organisations.</p>
-        <a href="./event-detail.php" class="card-link">View event details &rarr;</a>
+<!-- script.js 依 data-pagination 區塊 ID 更新列表，可在其他頁面重用。 -->
+<section id="events-results" class="service1-section" data-pagination aria-labelledby="event-list-heading">
+  <div class="section-header"><span class="section-badge">Explore CityLink</span><h2 id="event-list-heading" data-pagination-heading tabindex="-1">Events</h2></div>
+  <p data-pagination-status role="status" aria-live="polite"></p>
+  <?php if ($error): ?>
+    <p role="alert"><?= listEscape($error) ?></p><a class="card-link" href="./events.php">Return to events</a>
+  <?php else: ?>
+    <p data-pagination-summary><?= listEscape($pagination['summary']) ?></p>
+    <div class="cards-grid services-list">
+    <?php foreach ($services as $service): ?>
+      <article class="service-card" data-service-id="<?= (int) $service['service_id'] ?>">
+        <span class="section-badge"><?= listEscape($service['service_type_name']) ?></span>
+        <h3 class="card-title"><?= listEscape($service['service_title']) ?></h3>
+        <?php if ($service['service_short_desc']): ?><p class="card-desc"><?= listEscape($service['service_short_desc']) ?></p><?php endif; ?>
+        <?php if ($service['service_location']): ?><p class="card-desc"><strong>Location:</strong> <?= listEscape($service['service_location']) ?></p><?php endif; ?>
+        <p class="card-desc"><strong>Cost:</strong> <?= listEscape($service['fee_text']) ?></p>
+        <a href="<?= listEscape($service['detail_url']) ?>" class="card-link" aria-label="<?= listEscape('View details: ' . $service['service_title']) ?>">View details &rarr;</a>
       </article>
+    <?php endforeach; ?>
     </div>
-  </section>
-
-  <!-- Service Section -->
-  <section id="event-2" class="event2-section" aria-labelledby="event-2-heading">
-    <!-- Section heading -->
-    <div class="section-header">
-      <span class="section-badge">PRACTICAL WORKSHOP</span>
-      <h2 id="event-2-heading">Introduction to home composting</h2>
-    </div>
-
-    <!-- Service card grid -->
-    <div class="cards-grid">
-      <!-- Service card 2 -->
-      <article class="service-card">
-        <p class="announcement-date"><time datetime="2026-09-17T18:00">Thursday 17 September, 6–7:30 pm</time></p>
-        <p class="card-desc"><strong>Riverside Library meeting room</strong> · $5 per person</p>
-        <p class="card-desc">Learn how to choose a compost system, balance food and garden waste and prevent common composting problems.</p>
-        <a href="./booking.php" class="card-link">View event details &rarr;</a>
-      </article>
-    </div>
-  </section>
-
-  <!-- Service Section -->
-<section id="event-3" class="event1-section" aria-labelledby="event-3-heading">
-    <!-- Section heading -->
-    <div class="section-header">
-      <span class="section-badge">COMMUNITY WELLBEING</span>
-      <h2 id="event-3-heading">View event details</h2>
-    </div>
-
-    <!-- Service card grid -->
-    <div class="cards-grid">
-      <!-- Service card 3 -->
-      <article class="service-card">
-        <p class="announcement-date"><time datetime="2026-09-22T09:30">Tuesday 22 September, 9:30 am–12 pm</time></p>
-        <p class="card-desc"><strong>CityLink Community Hub</strong> · Free</p>
-        <p class="card-desc">Bring your phone, tablet or laptop and receive friendly one-to-one help with email, video calls and online services.</p>
-        <a href="./booking.php" class="card-link">Reserve a support session &rarr;</a>
-      </article>
-    </div>
-  </section>
- 
-  <?php showFooter(); ?>
-
+    <?php if ($pagination['pages'] > 1): ?>
+    <nav class="service-pagination" aria-label="Events pages">
+      <?php if ($pagination['previous_url']): ?><a data-page-link class="btn btn-secondary" rel="prev" href="<?= listEscape($pagination['previous_url']) ?>">&larr; Previous</a><?php endif; ?>
+      <span aria-current="page">Page <?= (int) $pagination['page'] ?> of <?= (int) $pagination['pages'] ?></span>
+      <?php if ($pagination['next_url']): ?><a data-page-link class="btn btn-secondary" rel="next" href="<?= listEscape($pagination['next_url']) ?>">Next &rarr;</a><?php endif; ?>
+    </nav>
+    <?php endif; ?>
+  <?php endif; ?>
+</section>
+<?php showFooter(); ?>

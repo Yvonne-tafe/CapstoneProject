@@ -13,7 +13,7 @@ showHeader('Services', 'services');
   </div>
 
   <!-- Form table container -->
-  <form class="form-table-container" novalidate>
+  <form class="form-table-container" data-demo-form novalidate>
     <table class="form-table">
       <thead>
         <tr>

@@ -1,0 +1,47 @@
+[
+  {
+    "announcement_type_id": 1,
+    "announcement_type_name": "Service Updates",
+    "announcement_type_quick_desc": "Service Changes & Hours",
+    "announcement_type_short_desc": "Updates regarding service operating hours, program availability, and service adjustments.",
+    "announcement_type_desc": "Information about routine services, schedule revisions, temporary disruptions, or newly introduced programs across CityLink.",
+    "announcement_type_note": "Default category for general service operational announcements.",
+    "active_status_id": 1
+  },
+  {
+    "announcement_type_id": 2,
+    "announcement_type_name": "Facility & Maintenance",
+    "announcement_type_quick_desc": "Repairs & Venue Updates",
+    "announcement_type_short_desc": "Notices on facility closures, scheduled repairs, upgrades, and maintenance.",
+    "announcement_type_desc": "Details of ongoing or upcoming maintenance work, temporary venue closures, and amenity improvement projects.",
+    "announcement_type_note": "Used when facility sessions or rooms may be unavailable for booking.",
+    "active_status_id": 1
+  },
+  {
+    "announcement_type_id": 3,
+    "announcement_type_name": "Events & Activities",
+    "announcement_type_quick_desc": "Featured Events",
+    "announcement_type_short_desc": "Highlights of upcoming community events, public celebrations, and key programs.",
+    "announcement_type_desc": "Promotions, schedules, and participation guidelines for upcoming community festivals, public workshops, and cultural events.",
+    "announcement_type_note": "Can link directly to Service/Event detail pages.",
+    "active_status_id": 1
+  },
+  {
+    "announcement_type_id": 4,
+    "announcement_type_name": "Community News",
+    "announcement_type_quick_desc": "Local News & Initiatives",
+    "announcement_type_short_desc": "General updates, community achievements, newsletters, and local stories.",
+    "announcement_type_desc": "Stories covering community achievements, volunteer initiatives, council highlights, and general informational updates.",
+    "announcement_type_note": "Non-urgent general updates for residents.",
+    "active_status_id": 1
+  },
+  {
+    "announcement_type_id": 5,
+    "announcement_type_name": "Urgent Alerts",
+    "announcement_type_quick_desc": "Emergency & Safety Notices",
+    "announcement_type_short_desc": "High-priority safety warnings, weather closures, and emergency notices.",
+    "announcement_type_desc": "Immediate notices requiring public awareness, including adverse weather advisories, sudden health and safety alerts, or urgent road/access closures.",
+    "announcement_type_note": "High priority banner display recommended.",
+    "active_status_id": 1
+  }
+]

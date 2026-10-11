@@ -1,0 +1,17 @@
+[
+  {
+    "session_status_id": 1,
+    "session_status_name": "Scheduled",
+    "session_status_desc": "The session is planned to take place."
+  },
+  {
+    "session_status_id": 2,
+    "session_status_name": "Cancelled",
+    "session_status_desc": "The session has been cancelled and will not take place."
+  },
+  {
+    "session_status_id": 3,
+    "session_status_name": "Completed",
+    "session_status_desc": "The session has finished."
+  }
+]

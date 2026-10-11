@@ -1,76 +1,64 @@
 <?php
+// 列表入口與版面：由 show_list.php 取得 JSON，再填入下方 HTML。
+// 資料庫查詢仍集中在 show_list.php，這個檔案不包含 SQL。
+require_once __DIR__ . '/includes/show_list.php';
+$listResult = loadServiceListJson(isset($_GET['page']) ? $_GET['page'] : null, 'Program');
+http_response_code($listResult['status']);
+$listJson = $listResult['json'];
 require_once __DIR__ . '/layout.php';
+if (!function_exists('listEscape')) {
+    function listEscape($value) { return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8'); }
+}
+$listData = json_decode($listJson, true);
+$services = $listData['services'];
+$pagination = $listData['pagination'];
+$error = $listData['error'];
 showHeader('Community programs', 'services');
 ?>
+ <!-- Hero Section -->
+  <section class="hero-section" aria-labelledby="hero-heading">
+    <div class="hero-content">
+      <span class="badge-text">WELCOME TO CITYLINK</span>
+      <h1 id="hero-heading">Community Programs</h1>
+      <p>Explore affordable local programs that support wellbeing, practical skills and stronger community connections.</p>
 
-<section class="hero-section" aria-labelledby="hero-heading">
-  <div class="hero-content">
-    <span class="badge-text">CITYLINK COMMUNITY PROGRAMS</span>
-    <h1 id="hero-heading">Connect, learn and take part</h1>
-    <p>Explore affordable local programs that support wellbeing, practical skills and stronger community connections.</p>
-  </div>
+    </div>
+    <div class="hero-card-visual" aria-hidden="true">
+      <div class="orange-circle"></div>
+      <div class="floating-box">
+        Your community<br>Your services<br>Your CityLink
+      </div>
+    </div>
+  </section>
+
+
+<!-- script.js 依 data-pagination 區塊 ID 更新列表，可在其他頁面重用。 -->
+<section id="programs-results" class="service1-section" data-pagination aria-labelledby="program-list-heading">
+  <div class="section-header"><span class="section-badge">Explore CityLink</span><h2 id="program-list-heading" data-pagination-heading tabindex="-1">Community programs</h2></div>
+  <p data-pagination-status role="status" aria-live="polite"></p>
+  <?php if ($error): ?>
+    <p role="alert"><?= listEscape($error) ?></p><a class="card-link" href="./community-programs.php">Return to community programs</a>
+  <?php else: ?>
+    <p data-pagination-summary><?= listEscape($pagination['summary']) ?></p>
+    <div class="cards-grid services-list">
+    <?php foreach ($services as $service): ?>
+      <article class="service-card" data-service-id="<?= (int) $service['service_id'] ?>">
+        <span class="section-badge"><?= listEscape($service['service_type_name']) ?></span>
+        <h3 class="card-title"><?= listEscape($service['service_title']) ?></h3>
+        <?php if ($service['service_short_desc']): ?><p class="card-desc"><?= listEscape($service['service_short_desc']) ?></p><?php endif; ?>
+        <?php if ($service['service_location']): ?><p class="card-desc"><strong>Location:</strong> <?= listEscape($service['service_location']) ?></p><?php endif; ?>
+        <p class="card-desc"><strong>Cost:</strong> <?= listEscape($service['fee_text']) ?></p>
+        <a href="<?= listEscape($service['detail_url']) ?>" class="card-link" aria-label="<?= listEscape('View details: ' . $service['service_title']) ?>">View details &rarr;</a>
+      </article>
+    <?php endforeach; ?>
+    </div>
+    <?php if ($pagination['pages'] > 1): ?>
+    <nav class="service-pagination" aria-label="Community programs pages">
+      <?php if ($pagination['previous_url']): ?><a data-page-link class="btn btn-secondary" rel="prev" href="<?= listEscape($pagination['previous_url']) ?>">&larr; Previous</a><?php endif; ?>
+      <span aria-current="page">Page <?= (int) $pagination['page'] ?> of <?= (int) $pagination['pages'] ?></span>
+      <?php if ($pagination['next_url']): ?><a data-page-link class="btn btn-secondary" rel="next" href="<?= listEscape($pagination['next_url']) ?>">Next &rarr;</a><?php endif; ?>
+    </nav>
+    <?php endif; ?>
+  <?php endif; ?>
 </section>
-
-<section id="program-1" class="service1-section" aria-labelledby="program-1-heading">
-  <div class="section-header">
-    <span class="section-badge">DIGITAL SKILLS</span>
-    <h2 id="program-1-heading">Digital confidence for everyday life</h2>
-  </div>
-
-  <div class="cards-grid">
-    <article class="service-card">
-      <p class="announcement-date">Tuesdays, 10 am–11:30 am · 6 October–10 November 2026</p>
-      <p class="card-desc"><strong>Location:</strong> Riverside Library computer room</p>
-      <p class="card-desc"><strong>Cost:</strong> Free · Bookings required</p>
-      <p class="card-desc">A six-week beginner program covering email, online safety, video calls and access to government and CityLink services. Library computers are available, or participants may bring their own device.</p>
-      <p class="card-desc"><strong>Suitable for:</strong> Adults with limited computer, tablet or smartphone experience.</p>
-      <a href="./program-detail.php" class="card-link">View details &rarr;</a>
-    </article>
-  </div>
-</section>
-
-<section id="program-2" class="service2-section" aria-labelledby="program-2-heading">
-  <div class="section-header">
-    <span class="section-badge">YOUTH PROGRAM</span>
-    <h2 id="program-2-heading">After-school creative studio</h2>
-  </div>
-
-  <div class="cards-grid">
-    <article class="service-card">
-      <p class="announcement-date">Wednesdays, 3:45 pm–5:15 pm · During school term</p>
-      <p class="card-desc"><strong>Location:</strong> Civic Arts Studio</p>
-      <p class="card-desc"><strong>Cost:</strong> $4 per session · Materials included</p>
-      <p class="card-desc">Young people can try drawing, painting, printmaking and simple digital design in a relaxed, supervised environment. Each session includes a new project and time to work on individual ideas.</p>
-      <p class="card-desc"><strong>Suitable for:</strong> Young people aged 12–17. A parent or guardian must complete the first registration.</p>
-      <a href="./program-detail.php" class="card-link">View details &rarr;</a>
-    </article>
-  </div>
-</section>
-
-<section id="program-3" class="service1-section" aria-labelledby="program-3-heading">
-  <div class="section-header">
-    <span class="section-badge">HEALTH AND WELLBEING</span>
-    <h2 id="program-3-heading">Community walking group</h2>
-  </div>
-
-  <div class="cards-grid">
-    <article class="service-card">
-      <p class="announcement-date">Fridays, 8 am–9 am · Weekly</p>
-      <p class="card-desc"><strong>Meeting point:</strong> Main entrance, CityLink Community Hub</p>
-      <p class="card-desc"><strong>Cost:</strong> Free · Registration recommended</p>
-      <p class="card-desc">Join a friendly, volunteer-led walk through local parks and shared paths. Routes are approximately three kilometres and include a short rest stop. New participants are welcome throughout the year.</p>
-      <p class="card-desc"><strong>Suitable for:</strong> Adults comfortable walking for up to one hour. Contact CityLink to discuss mobility or accessibility needs.</p>
-      <a href="./program-detail.php" class="card-link">View details &rarr;</a>
-    </article>
-  </div>
-</section>
-
-<section id="program-help" class="service2-section" aria-labelledby="program-help-heading">
-  <div class="section-header">
-    <span class="section-badge">PROGRAM SUPPORT</span>
-    <h2 id="program-help-heading">Need help taking part?</h2>
-    <p>Tell us about accessibility, communication or participation requirements when you book. For help choosing a program or registering, contact CityLink on <a href="tel:+61890001234">(08) 9000 1234</a> or visit the Community Hub.</p>
-  </div>
-</section>
-
 <?php showFooter(); ?>

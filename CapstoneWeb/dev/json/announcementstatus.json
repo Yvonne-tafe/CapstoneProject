@@ -1,0 +1,17 @@
+[
+  {
+    "announcement_status_id": 1,
+    "announcement_status_name": "Draft",
+    "announcement_status_desc": "The announcement is being prepared and is not publicly displayed."
+  },
+  {
+    "announcement_status_id": 2,
+    "announcement_status_name": "Published",
+    "announcement_status_desc": "The announcement is approved for public display from its publication date and time."
+  },
+  {
+    "announcement_status_id": 3,
+    "announcement_status_name": "Archived",
+    "announcement_status_desc": "The announcement is retained for reference and excluded from current public lists."
+  }
+]

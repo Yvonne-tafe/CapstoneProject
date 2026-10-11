@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/config/home_data.php';
+$homeData=homePageData();
 require_once __DIR__ . '/layout.php';
 showHeader('Home', 'home');
 ?>
@@ -55,7 +57,7 @@ showHeader('Home', 'home');
         <div class="card-icon">03</div>
         <h3 class="card-title">Rates Enquiries</h3>
         <p class="card-desc">View rates information and request support.</p>
-        <a href="./Template_AfterClick.html" class="card-link">View Rates Enquiries service &rarr;</a>
+        <a href="./rates-enquiry.php" class="card-link">View Rates Enquiries service &rarr;</a>
       </article>
 
       <!-- Service card 4 -->
@@ -63,7 +65,7 @@ showHeader('Home', 'home');
         <div class="card-icon">04</div>
         <h3 class="card-title">Community Programs</h3>
         <p class="card-desc">Discover grants, workshops and local programs.</p>
-        <a href="./services.php" class="card-link">View Community Programs service &rarr;</a>
+        <a href="./community-programs.php" class="card-link">View Community Programs &rarr;</a>
       </article>
 
     </div>
@@ -78,32 +80,17 @@ showHeader('Home', 'home');
     </div>
 
     <!-- Announcement card grid -->
+    <?php if ($homeData['announcement_error']): ?><p role="alert">Announcements are temporarily unavailable. Please try again later.</p>
+    <?php elseif (!$homeData['announcements']): ?><p>No announcements are currently available.</p><?php endif; ?>
     <div class="announcements-grid">
-      
-      <!-- Announcement card 1 -->
+      <?php foreach ($homeData['announcements'] as $announcement): ?>
       <article class="announcement-card">
-        <div class="announcement-date">30 July 2026</div>
-        <h3 class="announcement-title">Community centre renewal works</h3>
-        <p class="announcement-desc">The Riverside Community Centre upgrade begins this month, with temporary access arrangements in place.</p>
-        <a href="./announcement-detail.php" class="btn btn-primary btn-sm">Read more</a>
+        <div class="announcement-date"><time datetime="<?= serviceEscape($announcement['published_iso']) ?>"><?= serviceEscape($announcement['published_label']) ?></time></div>
+        <h3 class="announcement-title"><?= serviceEscape($announcement['announcement_title']) ?></h3>
+        <p class="announcement-desc"><?= serviceEscape($announcement['announcement_short_desc']) ?></p>
+        <a href="<?= serviceEscape($announcement['detail_url']) ?>" class="btn btn-primary btn-sm">Read more</a>
       </article>
-
-      <!-- Announcement card 2 -->
-      <article class="announcement-card">
-        <div class="announcement-date">24 July 2026</div>
-        <h3 class="announcement-title">Spring event registrations open</h3>
-        <p class="announcement-desc">Bookings are now available for family activities, workshops and community celebrations.</p>
-        <a href="./announcement-detail.php" class="btn btn-primary btn-sm">Read more</a>
-      </article>
-
-      <!-- Announcement card 3 -->
-      <article class="announcement-card">
-        <div class="announcement-date">18 July 2026</div>
-        <h3 class="announcement-title">Updated waste collection schedule</h3>
-        <p class="announcement-desc">Some collection days will change during the August public holiday period.</p>
-        <a href="./announcement-detail.php" class="btn btn-primary btn-sm">Read more</a>
-      </article>
-
+      <?php endforeach; ?>
     </div>
   </section>
 <!-- AROUND CITYLINK Section -->
@@ -116,32 +103,17 @@ showHeader('Home', 'home');
     </div>
 
     <!-- Community information card grid -->
+    <?php if ($homeData['featured_error']): ?><p role="alert">Featured information is temporarily unavailable. Please try again later.</p>
+    <?php elseif (!$homeData['featured']): ?><p>No featured information is currently available.</p><?php endif; ?>
     <div class="around-grid">
-      
-      <!-- Community information card 1 -->
+      <?php foreach ($homeData['featured'] as $item): ?>
       <article class="around-card">
-        <div class="around-tag">UPCOMING EVENTS</div>
-        <h3 class="around-title">Neighbourhood Spring Fair</h3>
-        <p class="around-desc">Saturday 15 August · Civic Square</p>
-        <a href="./event-detail.php" class="around-link">Learn more about the Neighbourhood Spring Fair &rarr;</a>
+        <div class="around-tag"><?= serviceEscape($item['label']) ?></div>
+        <h3 class="around-title"><?= serviceEscape($item['service_title']) ?></h3>
+        <p class="around-desc"><?= serviceEscape($item['service_short_desc']) ?></p>
+        <a href="<?= serviceEscape($item['detail_url']) ?>" class="around-link">Learn more &rarr;</a>
       </article>
-
-      <!-- Community information card 2 -->
-      <article class="around-card">
-        <div class="around-tag">COMMUNITY NEWS</div>
-        <h3 class="around-title">New youth mentoring hub</h3>
-        <p class="around-desc">A welcoming space for young people opens next month.</p>
-        <a href="./event-detail.php" class="around-link">Learn more about the youth mentoring hub &rarr;</a>
-      </article>
-
-      <!-- Community information card 3 -->
-      <article class="around-card">
-        <div class="around-tag">POPULAR SERVICES</div>
-        <h3 class="around-title">Need help with your rates?</h3>
-        <p class="around-desc">Find payment options, due dates and support information.</p>
-        <a href="./event-detail.php" class="around-link">Learn more about rates support &rarr;</a>
-      </article>
-
+      <?php endforeach; ?>
     </div>
   </section>
  
