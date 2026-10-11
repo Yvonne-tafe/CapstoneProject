@@ -1,5 +1,75 @@
 "use strict";
 
+/* 可重用的伺服器分頁：
+ * 1. 列表外層加唯一 id 與 data-pagination。
+ * 2. 分頁 a 標籤加 data-page-link，href 指向可獨立開啟的完整頁面。
+ * 3. 可加入 data-pagination-heading / status / summary 提供焦點與狀態提示。
+ * PHP 仍負責驗證參數、LIMIT/OFFSET 與 JSON → HTML；JS 只更新畫面。
+ * 不需 JSON API；fetch 取得下一頁 HTML，只替換同 ID 的列表區塊。
+ */
+document.addEventListener("DOMContentLoaded", () => {
+  if (!window.fetch || !window.AbortController) return; // 舊瀏覽器保留正常連結導覽。
+  let pending = null;
+  let generation = 0;
+  const loadPage = async (url, id, pushHistory) => {
+    const region = document.getElementById(id);
+    if (!region) return;
+    if (pending) pending.abort();
+    const request = new AbortController();
+    pending = request;
+    const requestId = ++generation;
+    const status = region.querySelector("[data-pagination-status]");
+    region.setAttribute("aria-busy", "true");
+    if (status) status.textContent = "Loading…";
+    try {
+      const response = await fetch(url.href, { signal: request.signal, credentials: "same-origin" });
+      if (!response.ok) throw new Error("Page unavailable");
+      const html = await response.text();
+      if (requestId !== generation) return;
+      const parsed = new DOMParser().parseFromString(html, "text/html");
+      const replacement = parsed.getElementById(id);
+      if (!replacement || !replacement.hasAttribute("data-pagination") || replacement.querySelector('[role="alert"]')) {
+        throw new Error("Invalid page response");
+      }
+      replacement.removeAttribute("aria-busy");
+      const nextStatus = replacement.querySelector("[data-pagination-status]");
+      const summary = replacement.querySelector("[data-pagination-summary]");
+      // 筆數已由 summary 顯示；status 只保留載入／錯誤提示，避免重複顯示。
+      if (nextStatus) nextStatus.textContent = summary ? "" : "Page loaded.";
+      region.replaceWith(replacement);
+      if (pushHistory) history.pushState({ paginationId: id }, "", url.href);
+      const heading = replacement.querySelector("[data-pagination-heading]");
+      if (heading) heading.focus({ preventScroll: true });
+      replacement.scrollIntoView({ block: "start", behavior: "auto" });
+    } catch (error) {
+      if (error.name === "AbortError") return;
+      if (!pushHistory) { window.location.reload(); return; }
+      if (status) status.textContent = "Unable to load this page. Please try again.";
+    } finally {
+      if (requestId === generation) {
+        region.removeAttribute("aria-busy");
+        pending = null;
+      }
+    }
+  };
+  // 事件委派：替換列表後不用重新綁定每個按鈕。
+  document.addEventListener("click", event => {
+    const link = event.target.closest("a[data-page-link]");
+    if (!link || event.defaultPrevented || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || link.target || link.hasAttribute("download")) return;
+    const region = link.closest("[data-pagination]");
+    const url = new URL(link.href, window.location.href);
+    if (!region || !region.id || url.origin !== window.location.origin) return;
+    event.preventDefault();
+    if (!history.state || !history.state.paginationId) {
+      history.replaceState(Object.assign({}, history.state, { paginationId: region.id }), "", window.location.href);
+    }
+    loadPage(url, region.id, true);
+  });
+  window.addEventListener("popstate", event => {
+    if (event.state && event.state.paginationId) loadPage(new URL(window.location.href), event.state.paginationId, false);
+  });
+});
+
 // Run the script after the HTML page has loaded.
 document.addEventListener("DOMContentLoaded", () => {
   // Check whether the user prefers reduced motion.
@@ -77,7 +147,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Find the sample form on the form template page.
-  const formContainer = document.querySelector(".form-table-container");
+  const formContainer = document.querySelector("form[data-demo-form]");
 
   if (formContainer) {
     const inputs = [...formContainer.querySelectorAll('input[type="text"]')];
@@ -116,6 +186,76 @@ document.addEventListener("DOMContentLoaded", () => {
     link.addEventListener("click", (event) => {
       event.preventDefault();
       showMessage(`${link.textContent.trim() || "This link"} will be connected during development.`);
+    });
+  });
+});
+
+/* Booking calendar: links work without JS; JS reveals the form without a reload. */
+document.addEventListener('DOMContentLoaded', function () {
+  const root = document.querySelector('[data-booking-calendar]');
+  if (!root) return;
+  const dataNode = document.getElementById('booking-dates');
+  const form = document.getElementById('booking-form');
+  if (!dataNode || !form) return;
+  const dates = JSON.parse(dataNode.textContent);
+  const sessionSelect = form.querySelector('[name="session_id"]');
+  const updateSessionSummary = function () {
+    form.querySelector('[data-booking-session-summary]').textContent = sessionSelect.value ? sessionSelect.options[sessionSelect.selectedIndex].textContent : '';
+  };
+  sessionSelect.addEventListener('change', updateSessionSummary);
+  root.addEventListener('click', function (event) {
+    const link = event.target.closest('[data-booking-date]');
+    if (!link || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || event.button !== 0) return;
+    const date = link.getAttribute('data-booking-date');
+    if (!dates[date]) return;
+    event.preventDefault();
+    const select = form.querySelector('[name="session_id"]');
+    select.textContent = '';
+    select.add(new Option('Choose a time', ''));
+    dates[date].forEach(function (slot) { select.add(new Option(slot.label, slot.id)); });
+    if (dates[date].length === 1) select.value = String(dates[date][0].id);
+    form.querySelector('[name="date"]').value = date;
+    form.querySelector('[data-booking-form-date]').textContent = 'Selected date: ' + date + ' (Perth time)';
+    updateSessionSummary();
+    root.querySelectorAll('[data-booking-date]').forEach(function (day) { day.removeAttribute('aria-current'); });
+    link.setAttribute('aria-current', 'date');
+    root.querySelector('[data-booking-date-status]').textContent = 'Selected date: ' + date + ' (Perth time)';
+    form.hidden = false;
+    form.querySelector('h2').focus();
+    form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+
+// A phone response requires a contact number; keep native browser validation.
+document.addEventListener('DOMContentLoaded', function () {
+  const form = document.getElementById('rates-enquiry');
+  if (!form) return;
+  const phone = form.querySelector('[name="phone"]');
+  const updatePhoneRequired = function () {
+    const method = form.querySelector('[name="response_method"]:checked');
+    phone.required = !!method && method.value === 'phone';
+  };
+  form.querySelectorAll('[name="response_method"]').forEach(function (radio) {
+    radio.addEventListener('change', updatePhoneRequired);
+  });
+  updatePhoneRequired();
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+  const form = document.getElementById('member-feedback');
+  if (!form) return;
+  const checkbox = form.querySelector('[name="response_requested"]');
+  const email = form.querySelector('[name="email"]');
+  const updateRequired = function () { email.required = checkbox.checked; };
+  checkbox.addEventListener('change', updateRequired);
+  updateRequired();
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('[data-admin-edit]').forEach(function (row) {
+    row.addEventListener('dblclick', function (event) {
+      if (event.target.closest('a, button, input, select, textarea')) return;
+      window.location.href = row.getAttribute('data-admin-edit');
     });
   });
 });

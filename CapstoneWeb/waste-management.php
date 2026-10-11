@@ -55,7 +55,7 @@ showHeader('Waste and recycling', 'services');
       <div class="announcement-contact-card">
         <h2>Request assistance</h2>
         <p>Use the service request form for a missed collection, damaged bin or new residential bin request.</p>
-        <a class="btn btn-primary" href="./booking.php">Start a waste request</a>
+        <a class="btn btn-primary" href="./service_detail.php?service_id=23">Start an Appointment</a>
       </div>
       <div class="announcement-update-card">
         <h2>Waste Services</h2>

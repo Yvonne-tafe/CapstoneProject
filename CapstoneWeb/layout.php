@@ -22,8 +22,13 @@
  * PHP destinations as those pages are converted. No authentication is added.
  */
 
+require_once __DIR__ . '/config/auth.php';
+
 function showHeader($pageTitle = 'CityLink', $activePage = '')
 {
+    try { $headerUser = authCurrentUser(); }
+    catch (Exception $e) { error_log('Header account: ' . $e->getMessage()); $headerUser = null; }
+    if ($headerUser) { header('Cache-Control: no-store'); }
 ?>
 <!DOCTYPE html>
 <html lang="en-AU">
@@ -61,7 +66,21 @@ function showHeader($pageTitle = 'CityLink', $activePage = '')
         <input type="search" name="q" aria-label="Search CityLink services and information" placeholder="Search services and information">
         <button type="submit" class="search-icon" aria-label="Submit search">⌕</button>
       </form>
+      <?php if ($headerUser): ?>
+      <div class="header-account-actions">
+      <?php if ($headerUser['role_name']==='admin'): ?>
+      <a href="./admin.php" class="btn btn-primary">Administration</a>
+      <?php else: ?>
+      <a href="./account.php" class="btn btn-primary">My account</a>
+      <?php endif; ?>
+      <form class="header-logout-form" method="post" action="./logout.php">
+        <input type="hidden" name="csrf_token" value="<?= serviceEscape(authToken()) ?>">
+        <button class="header-logout-link" type="submit">log out</button>
+      </form>
+      </div>
+      <?php else: ?>
       <a href="./login.php" class="btn btn-primary">Login / Sign Up</a>
+      <?php endif; ?>
     </div>
   </header>
   
@@ -198,7 +217,7 @@ $columnIds = [
         &copy; 2026 CityLink Initiatives. All rights reserved.
     </div>
 </footer>
-  <script src="./script.js" defer></script>
+  <script src="./script.js?v=<?= filemtime(__DIR__ . '/script.js') ?>" defer></script>
 </body>
 </html>
 <?php
