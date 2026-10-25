@@ -75,35 +75,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // Check whether the user prefers reduced motion.
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
-  // Show an accessible message in the bottom-right corner.
-  const showMessage = (message) => {
-    let status = document.querySelector("#page-status");
-
-    if (!status) {
-      status = document.createElement("div");
-      status.id = "page-status";
-      status.setAttribute("role", "status");
-      status.setAttribute("aria-live", "polite");
-      status.style.position = "fixed";
-      status.style.right = "16px";
-      status.style.bottom = "16px";
-      status.style.zIndex = "1000";
-      status.style.maxWidth = "360px";
-      status.style.padding = "12px 16px";
-      status.style.borderRadius = "4px";
-      status.style.background = "#08263D";
-      status.style.color = "#FFFFFF";
-      status.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.2)";
-      document.body.append(status);
-    }
-
-    status.textContent = message;
-    window.clearTimeout(showMessage.timeoutId);
-    showMessage.timeoutId = window.setTimeout(() => {
-      status.remove();
-    }, 3500);
-  };
-
   // Move to a page section with optional smooth scrolling.
   const scrollToSection = (selector) => {
     const section = document.querySelector(selector);
@@ -116,40 +87,37 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  // Add actions to the template buttons.
-  document.querySelectorAll("button").forEach((button) => {
+  // Home-page buttons scroll to sections; account and detail links use PHP routes.
+  document.querySelectorAll(".hero-buttons button").forEach((button) => {
     const label = button.textContent.trim().toLowerCase();
 
     if (label === "explore services") {
       button.addEventListener("click", () => scrollToSection(".most-used-section"));
     } else if (label === "announcements") {
       button.addEventListener("click", () => scrollToSection(".stay-informed-section"));
-    } else if (label === "login / sign up") {
-      button.addEventListener("click", () => {
-        window.location.href = "./Template_General_Login.html";
-      });
-    } else if (label === "logout") {
-      button.addEventListener("click", () => {
-        window.location.href = "./Template_General.html";
-      });
-    } else if (label === "account") {
-      button.addEventListener("click", () => {
-        showMessage("The account page will be connected during development.");
-      });
-    } else if (label === "read more") {
-      button.addEventListener("click", () => {
-        const cardTitle = button.closest(".announcement-card")
-          ?.querySelector("h3")
-          ?.textContent.trim();
-        showMessage(`${cardTitle || "This announcement"} will open on the completed website.`);
-      });
     }
   });
 
-  // Find the sample form on the form template page.
+});
+
+// Client-side example used only by template/Template_form.php.
+// Production forms use their own PHP submission and validation handlers.
+document.addEventListener("DOMContentLoaded", () => {
   const formContainer = document.querySelector("form[data-demo-form]");
 
   if (formContainer) {
+    // Keep demonstration messages inside the demo form, away from production pages.
+    const showMessage = (message) => {
+      let status = formContainer.querySelector("[data-demo-status]");
+      if (!status) {
+        status = document.createElement("p");
+        status.setAttribute("data-demo-status", "");
+        status.setAttribute("role", "status");
+        status.setAttribute("aria-live", "polite");
+        formContainer.append(status);
+      }
+      status.textContent = message;
+    };
     const inputs = [...formContainer.querySelectorAll('input[type="text"]')];
 
     // Check text fields that are explicitly marked as required.
@@ -172,7 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      showMessage("Form validated successfully. Server submission will be added later.");
+      showMessage("Demo validation passed. This example does not submit or save data.");
     });
 
     // Remove the invalid state when the user starts typing.
@@ -181,13 +149,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Prevent unfinished placeholder links from jumping to the page top.
-  document.querySelectorAll('a[href="#"]').forEach((link) => {
-    link.addEventListener("click", (event) => {
-      event.preventDefault();
-      showMessage(`${link.textContent.trim() || "This link"} will be connected during development.`);
-    });
-  });
 });
 
 /* Booking calendar: links work without JS; JS reveals the form without a reload. */

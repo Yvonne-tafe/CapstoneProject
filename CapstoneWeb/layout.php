@@ -1,13 +1,14 @@
 <?php
 /**
- * CityLink shared page frame, based on services.html.
+ * Shared CityLink page layout for the PHP application.
  * Keep this file and calling pages beside style.css and script.js.
  * Run through a PHP web server (opening a PHP file directly will not work).
- * Including this file only defines functions; it does not print a page.
+ * Including this file initialises the authentication helpers and session,
+ * then defines layout functions without printing page content.
  *
  * Example usage in a new page such as services.php:
  *   <?php
- *   require_once __DIR__ . '/template.php';
+ *   require_once __DIR__ . '/layout.php';
  *   showHeader('Services', 'services');
  *   ?>
  *   <section class="form-section">
@@ -18,8 +19,10 @@
  *
  * showHeader opens <main>; showFooter closes it. Do not add another <main>.
  * Hero sections belong to the calling page, not this shared template.
- * Navigation currently targets existing HTML files. Update these links to
- * PHP destinations as those pages are converted. No authentication is added.
+ * Primary navigation and footer content come from navigation.json and footer.json.
+ * The header displays account actions for the current authenticated user.
+ * Protected pages must enforce access through authRequireUser() or adminRequire();
+ * hiding a navigation link does not restrict access to its destination.
  */
 
 require_once __DIR__ . '/config/auth.php';
@@ -87,12 +90,12 @@ function showHeader($pageTitle = 'CityLink', $activePage = '')
    <!-- Navigation bar -->
   <nav class="site-nav" aria-label="Primary navigation">
   <?php
-    //read navigtion from a Json file
+    // Read primary navigation from the shared JSON configuration.
     $jsonFile = __DIR__ . '/navigation.json';
     $menuData = file_exists($jsonFile) ? json_decode(file_get_contents($jsonFile), true) : ['navigation' => []];
     $currentPath = basename($_SERVER['PHP_SELF']);
   ?>
-  <?php //if there is any issue, do Not display the navigation bar ?>
+  <?php // Render menu items only when a non-empty navigation array is available. ?>
   <?php if (!empty($menuData['navigation']) && is_array($menuData['navigation'])): ?>
   <?php foreach ($menuData['navigation'] as $item): ?>
         <?php 
