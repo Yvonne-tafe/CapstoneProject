@@ -36,7 +36,7 @@ showHeader('Search');
   <?php endforeach; ?>
   <?php if (!$data['total']): ?>
     <section class="service1-section" aria-labelledby="no-results-heading">
-      <div class="section-header"><span class="section-badge">No results</span><h2 id="no-results-heading">沒有符合的結果</h2></div>
+      <div class="section-header"><span class="section-badge">No results</span><h2 id="no-results-heading">No matching results</h2></div>
       <div class="cards-grid"><article class="service-card">
         <p class="card-desc">Check the spelling, use fewer words or try a broader term such as “rates”, “waste”, “events” or “contact”.</p>
         <a href="./services.php" class="card-link">Browse all services &rarr;</a>
