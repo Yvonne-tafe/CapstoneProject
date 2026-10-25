@@ -1,17 +1,23 @@
 <?php
+// Member profile controller: authenticate, validate, save, then render or redirect.
 require_once __DIR__.'/config/auth.php'; $errors=array(); $user=null;
 try { $user=authRequireUser(); } catch (Exception $e) { error_log('Account edit: '.$e->getMessage()); http_response_code(503); $errors[]='Your account is temporarily unavailable. Please try again later.'; }
 $keys=array('user_first_name','user_surname','user_email','user_phone_number','user_address','user_gender','preferred_contact_method','user_date_of_birth'); $data=array();
 if ($user) {
  foreach ($keys as $key) { $data[$key]=$_SERVER['REQUEST_METHOD']==='POST'?authInput($key):(string)$user[$key]; }
  if ($_SERVER['REQUEST_METHOD']==='POST') {
+  // Validate profile fields and the CSRF token before preparing an update.
   $errors=authProfileValidate($data); if (!authCsrf()) { $errors[]='Your form expired. Please try again.'; }
+  // Changing the login email additionally requires the current password.
   $emailChanged=$data['user_email']!==$user['user_email'];
   if ($emailChanged && !password_verify(authPassword('current_password'),$user['password_hash'])) { $errors[]='Enter your current password to change your email address.'; }
   if (!$errors) { try {
+   // Save the profile atomically; optional empty values are stored as NULL.
    $db=authDb(); $db->beginTransaction(); $values=array(); foreach ($keys as $key) { $values[]=$data[$key]===''?null:$data[$key]; } $values[]=$user['user_id'];
    $q=$db->prepare('UPDATE User SET user_first_name=?,user_surname=?,user_email=?,user_phone_number=?,user_address=?,user_gender=?,preferred_contact_method=?,user_date_of_birth=? WHERE user_id=?'); $q->execute($values);
+   // Revoke other login sessions after an email change; retain this session.
    if ($emailChanged) { $q=$db->prepare('UPDATE UserSession SET revoked_at=NOW() WHERE user_id=? AND session_token_hash<>? AND revoked_at IS NULL'); $q->execute(array($user['user_id'],hash('sha256',$_SESSION['user_session_token']))); }
+   // Redirect after a successful POST so refresh does not repeat the update.
    $db->commit(); header('Location: ./account.php?updated=1'); exit;
   } catch (Exception $e) {
    if (isset($db) && $db->inTransaction()) { $db->rollBack(); }

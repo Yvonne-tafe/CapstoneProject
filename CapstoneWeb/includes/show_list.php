@@ -1,9 +1,9 @@
 <?php
-// 列表資料層：查詢、驗證分頁與整理 JSON；不輸出 HTML。
+// List data layer: query, validate pagination, and prepare JSON; produce no HTML output.
 require_once __DIR__ . '/../config/service_data.php';
 require_once __DIR__ . '/../config/catalog_pages.php';
 require_once __DIR__ . '/../config/announcement_data.php';
-// 同一份查詢支援 Service / Event；預設保留既有 Service 呼叫方式。
+// The same query supports Service / Event; retain existing Service calls by default.
 function loadServiceListJson($rawPage, $type = 'Service') {
     $config = catalogPageConfig($type);
     $filter = catalogTypeFilter($config);
@@ -15,7 +15,7 @@ function loadServiceListJson($rawPage, $type = 'Service') {
     } else {
         try {
             $pdo = serviceDatabase();
-            // 總數與當頁使用相同條件：只顯示指定的啟用分類。
+            // Use identical filters for totals and the current page: display only the specified active categories.
             $from = ' FROM Service s JOIN ServiceType t ON t.service_type_id=s.service_type_id WHERE s.active_status_id=1 AND t.active_status_id=1 AND ' . $filter['sql'];
             $q = $pdo->prepare('SELECT COUNT(*)' . $from);
             $q->execute($filter['params']);
@@ -27,7 +27,7 @@ function loadServiceListJson($rawPage, $type = 'Service') {
             if ($page > $pages) {
                 $status = 404; $data['error'] = 'This page does not exist. Please return to the first page.';
             } else {
-                // 僅查詢公開顯示欄位；每次從 DB 取最多 10 筆，不把所有服務載入瀏覽器。
+                // Query only public display fields, fetching at most 10 records per request instead of loading all services into the browser.
                 $q = $pdo->prepare('SELECT s.service_id,s.service_title,s.service_short_desc,s.service_location,s.service_fee,s.service_fee_basis,t.service_type_name' . $from . ' ORDER BY s.service_id LIMIT :limit OFFSET :offset');
                 foreach ($filter['params'] as $parameter => $value) {
                     $q->bindValue($parameter, $value, PDO::PARAM_STR);
@@ -58,7 +58,7 @@ function loadServiceListJson($rawPage, $type = 'Service') {
     return array('status' => $status, 'json' => $json);
 }
 
-// 公告同樣回傳 JSON；保留公告獨有的發布狀態及時間規則。
+// Announcements also return JSON while retaining their specific publication status and timing rules.
 function loadAnnouncementListJson($rawPage) {
     $status=200;
     $data=array('error'=>null,'announcements'=>array(),'pagination'=>array('page'=>1,'page_size'=>10,'total'=>0,'pages'=>1,'summary'=>'','previous_url'=>null,'next_url'=>null));

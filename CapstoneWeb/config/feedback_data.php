@@ -1,8 +1,18 @@
 <?php
 require_once __DIR__.'/auth.php';
+/**
+ * Load valid feedback categories for rendering and server-side validation.
+ */
 function feedbackCategories() {
     $q=authDb()->query('SELECT feedback_category_id,feedback_category_name FROM FeedbackCategory ORDER BY feedback_category_id'); return $q->fetchAll(PDO::FETCH_ASSOC);
 }
+/**
+ * Prepare and process member-linked or anonymous feedback.
+ * Require subject/message and validate category, response preference and tokens.
+ * A response request requires email; otherwise name/email may be omitted.
+ * Store subject with the message, consume the form token and redirect to a receipt.
+ * @return array Form values, categories, errors, receipt and form token.
+ */
 function feedbackPageData() {
     header('Cache-Control: no-store');
     $data=array('values'=>array('feedback_type'=>'','subject'=>'','message'=>'','full_name'=>'','email'=>'','response_requested'=>''),'categories'=>array(),'errors'=>array(),'success'=>null);
@@ -25,8 +35,10 @@ function feedbackPageData() {
             if (($v['email']!=='' || $v['response_requested']==='yes') && (!filter_var($v['email'],FILTER_VALIDATE_EMAIL) || strlen($v['email'])>254)) { $data['errors'][]='Enter a valid email address; it is required when requesting a response.'; }
             if (!authCsrf() || empty($_SESSION['feedback_form_token']) || !hash_equals($_SESSION['feedback_form_token'],authInput('form_token'))) { $data['errors'][]='This form expired or was already submitted. Please try again.'; }
             if (!$data['errors']) {
+                // A signed-in submission links to that member; anonymous submissions retain NULL.
                 $q=authDb()->prepare('INSERT INTO Feedback (user_id,feedback_category_id,feedback_name,feedback_email,feedback_message,response_request) VALUES (?,?,?,?,?,?)');
                 $q->execute(array($member?$member['user_id']:null,$v['feedback_type'],$v['full_name']===''?null:$v['full_name'],$v['email']===''?null:$v['email'], 'Subject: '.$v['subject']."\n\n".$v['message'],$v['response_requested']==='yes'?1:0));
+                // Consume the submission token and redirect to prevent refresh resubmission.
                 $_SESSION['feedback_receipt']='FB-'.authDb()->lastInsertId(); unset($_SESSION['feedback_form_token']); header('Location: ./feedback.php',true,303); exit;
             }
             http_response_code(422);

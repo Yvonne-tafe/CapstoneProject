@@ -1,6 +1,6 @@
 <?php
-// 列表入口與版面：由 show_list.php 取得 JSON，再填入下方 HTML。
-// 資料庫查詢仍集中在 show_list.php，這個檔案不包含 SQL。
+// List entry point and layout: retrieve JSON from show_list.php and populate the HTML below.
+// Database queries remain in show_list.php; this file contains no SQL.
 require_once __DIR__ . '/includes/show_list.php';
 $listResult = loadServiceListJson(isset($_GET['page']) ? $_GET['page'] : null, 'Program');
 http_response_code($listResult['status']);
@@ -32,7 +32,7 @@ showHeader('Community programs', 'services');
   </section>
 
 
-<!-- script.js 依 data-pagination 區塊 ID 更新列表，可在其他頁面重用。 -->
+<!-- script.js updates the list using the data-pagination container ID; this behaviour can be reused on other pages. -->
 <section id="programs-results" class="service1-section" data-pagination aria-labelledby="program-list-heading">
   <div class="section-header"><span class="section-badge">Explore CityLink</span><h2 id="program-list-heading" data-pagination-heading tabindex="-1">Community programs</h2></div>
   <p data-pagination-status role="status" aria-live="polite"></p>

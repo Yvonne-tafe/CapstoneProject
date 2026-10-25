@@ -25,6 +25,10 @@ if (!function_exists('password_hash')) {
     }
     function password_verify($password,$hash) { return is_string($hash) && strlen($hash)===60 && hash_equals($hash,crypt($password,$hash)); }
 }
+/**
+ * Start the PHP session once and configure its cookie transport settings.
+ * The secure-cookie flag follows the current HTTPS request.
+ */
 function authStart() {
     if (session_id() === '') {
         ini_set('session.use_strict_mode', '1');
@@ -36,11 +40,37 @@ function authStart() {
     }
 }
 authStart();
+/**
+ * Reuse the shared PDO connection for authentication and account queries.
+ * @return PDO
+ */
 function authDb() { static $db; if (!$db) { $db=serviceDatabase(); } return $db; }
+/**
+ * Return the session CSRF token, creating it on first use.
+ * @return string Hexadecimal token used by server-rendered forms.
+ */
 function authToken() { if (empty($_SESSION['csrf_token'])) { $_SESSION['csrf_token']=bin2hex(random_bytes(32)); } return $_SESSION['csrf_token']; }
+/**
+ * Compare the submitted CSRF token with the current session token.
+ * @return bool False for absent, non-string or mismatched tokens.
+ */
 function authCsrf() { return isset($_POST['csrf_token']) && is_string($_POST['csrf_token']) && hash_equals(authToken(), $_POST['csrf_token']); }
+/**
+ * Read a scalar POST value and trim surrounding whitespace.
+ * @return string Empty string for absent or non-string input.
+ */
 function authInput($key) { return isset($_POST[$key]) && is_string($_POST[$key]) ? trim($_POST[$key]) : ''; }
+/**
+ * Read a POST password without trimming meaningful spaces.
+ * @return string Empty string for absent or non-string input.
+ */
 function authPassword($key) { return isset($_POST[$key]) && is_string($_POST[$key]) ? $_POST[$key] : ''; }
+/**
+ * Resolve identity from the server-side login token, not a request user ID.
+ * Only unrevoked, unexpired UserSession records are accepted.
+ * @return array|null User fields plus role_name, or null when unauthenticated.
+ * @throws PDOException When the database lookup fails.
+ */
 function authCurrentUser() {
     if (empty($_SESSION['user_session_token']) || !is_string($_SESSION['user_session_token'])) { return null; }
     $q=authDb()->prepare('SELECT u.*, r.role_name FROM UserSession s JOIN User u ON u.user_id=s.user_id JOIN Role r ON r.role_id=u.role_id WHERE s.session_token_hash=? AND s.revoked_at IS NULL AND s.expires_at>NOW()');
@@ -48,12 +78,23 @@ function authCurrentUser() {
     $user=$q->fetch(PDO::FETCH_ASSOC); $q->closeCursor();
     return $user ?: null;
 }
+/**
+ * Require authentication before rendering a member page.
+ * Unauthenticated requests redirect to login and terminate.
+ * @return array The authenticated user; database errors propagate to the caller.
+ */
 function authRequireUser() {
     header('Cache-Control: no-store');
     $user=authCurrentUser();
     if (!$user) { header('Location: ./login.php'); exit; }
     return $user;
 }
+/**
+ * Create a two-hour database session after the caller verifies credentials.
+ * Store only the token hash in MySQL; keep the original in the PHP session.
+ * Revoke the previous login token and rotate the PHP session ID and CSRF token.
+ * @param int $id The user ID already authenticated by the login controller.
+ */
 function authLogin($id) {
     $token=bin2hex(random_bytes(32));
     $q=authDb()->prepare('INSERT INTO UserSession (user_id,session_token_hash,expires_at) VALUES (?,?,DATE_ADD(NOW(),INTERVAL 2 HOUR))');
@@ -66,15 +107,28 @@ function authLogin($id) {
     $_SESSION['user_session_token']=$token;
     $_SESSION['csrf_token']=bin2hex(random_bytes(32));
 }
+/**
+ * Render escaped validation messages in an accessible alert region.
+ */
 function authErrors($errors) {
     if (!$errors) { return; }
     echo '<div role="alert" class="booking-errors"><h2>Please check your details</h2><ul>';
     foreach ($errors as $error) { echo '<li>'.serviceEscape($error).'</li>'; }
     echo '</ul></div>';
 }
+/**
+ * Render one labelled, escaped input row for account-related forms.
+ */
 function authField($key,$label,$value,$type='text',$required=false,$max=255) {
     echo '<tr><th scope="row"><label for="'.serviceEscape($key).'">'.serviceEscape($label).'</label></th><td><input id="'.serviceEscape($key).'" name="'.serviceEscape($key).'" type="'.serviceEscape($type).'" value="'.serviceEscape($value).'" maxlength="'.(int)$max.'"'.($required?' required':'').($type==='password'?' autocomplete="new-password"':'').'></td></tr>';
 }
+/**
+ * Validate the shared registration/profile field structure.
+ * Checks names, email, allowed options, contact preference and date of birth.
+ * String length limits here use bytes; date checks use Perth local dates.
+ * Password, CSRF and duplicate-email checks are handled by the calling page.
+ * @return array Validation messages; an empty array indicates no detected errors.
+ */
 function authProfileValidate($data) {
     $errors=array();
     foreach (array('user_first_name'=>100,'user_surname'=>100,'user_email'=>254,'user_phone_number'=>30,'user_address'=>255,'user_gender'=>50,'preferred_contact_method'=>20) as $key=>$max) {

@@ -1,5 +1,5 @@
 <?php
-// 畫面層：資料與可預約條件集中於 show_booking_list.php。
+// Presentation layer: show_booking_list.php centralises data and booking eligibility rules.
 require_once __DIR__ . '/includes/show_booking_list.php';
 require_once __DIR__ . '/config/booking_user.php';
 $result = loadBookingListJson();

@@ -1,10 +1,10 @@
 <?php
-// 服務頁面共用資料與輸出工具，相容 PHP 5.4。
+// Shared service page data and rendering helpers, compatible with PHP 5.4.
 function serviceEscape($value) {
     return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
 }
 function serviceDatabase() {
-    // 既有連線檔含 echo；攔截輸出，避免出現在公開頁面或影響 HTTP 狀態碼。
+    // The existing connection file echoes output; capture it to prevent public output or interference with HTTP status codes.
     ob_start();
     try { require __DIR__ . '/database.php'; }
     catch (Exception $e) { ob_end_clean(); throw $e; }
@@ -31,7 +31,7 @@ function serviceImageUrl($value) {
     if (strpos($url, ':') !== false && !preg_match('~^https?://~i', $url)) { return ''; }
     return $url;
 }
-// 每個內容區塊依 content_type 輸出，新的 content_key 也能正常顯示。
+// Render each content block by content_type so new content_key values can also be displayed.
 function renderServiceBlock($block) {
     $type = $block['content_type'];
     $heading = isset($block['content_heading']) ? $block['content_heading'] : '';

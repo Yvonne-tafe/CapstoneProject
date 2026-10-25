@@ -1,5 +1,5 @@
 <?php
-// 控制器：接收網址參數，取得 JSON，設定狀態碼，再交給版型呈現。
+// Controller: read URL parameters, retrieve JSON, set the status code, and render the template.
 require_once __DIR__ . '/includes/show_detail.php';
 $detailResult = loadServiceDetailJson(isset($_GET['service_id']) ? $_GET['service_id'] : null);
 http_response_code($detailResult['status']);

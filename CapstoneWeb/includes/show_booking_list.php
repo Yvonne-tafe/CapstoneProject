@@ -1,5 +1,5 @@
 <?php
-// 與詳細頁及提交表單共用可預約條件，回傳公開清單 JSON。
+// Share booking eligibility rules with detail pages and form submissions; return public list JSON.
 require_once __DIR__ . '/session.php';
 function loadBookingListJson() {
     $data = array('error'=>null,'activities'=>array(),'services'=>array());

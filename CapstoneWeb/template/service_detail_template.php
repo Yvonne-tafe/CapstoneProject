@@ -1,6 +1,6 @@
 <?php
-// 純版型：接收 service_detail.php 傳來的 JSON，不查詢資料庫。
-// 直接開啟版型時，轉到網站根目錄的控制器。
+// Presentation-only template: receive JSON from service_detail.php without querying the database.
+// If the template is opened directly, redirect to the controller in the website root.
 if (!isset($detailJson)) {
     $query = isset($_GET['service_id']) && is_string($_GET['service_id']) ? '?service_id=' . rawurlencode($_GET['service_id']) : '';
     header('Location: ../service_detail.php' . $query, true, 302); exit;

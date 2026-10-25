@@ -1,14 +1,14 @@
 "use strict";
 
-/* 可重用的伺服器分頁：
- * 1. 列表外層加唯一 id 與 data-pagination。
- * 2. 分頁 a 標籤加 data-page-link，href 指向可獨立開啟的完整頁面。
- * 3. 可加入 data-pagination-heading / status / summary 提供焦點與狀態提示。
- * PHP 仍負責驗證參數、LIMIT/OFFSET 與 JSON → HTML；JS 只更新畫面。
- * 不需 JSON API；fetch 取得下一頁 HTML，只替換同 ID 的列表區塊。
+/* Reusable server-side pagination:
+ * 1. Give the list container a unique id and data-pagination attribute.
+ * 2. Add data-page-link to pagination anchors, with href pointing to a complete page that opens independently.
+ * 3. Optional data-pagination-heading / status / summary attributes provide focus and status feedback.
+ * PHP validates parameters, applies LIMIT/OFFSET, and converts JSON to HTML; JavaScript only updates the view.
+ * No JSON API is required; fetch retrieves the next HTML page and replaces only the list container with the matching ID.
  */
 document.addEventListener("DOMContentLoaded", () => {
-  if (!window.fetch || !window.AbortController) return; // 舊瀏覽器保留正常連結導覽。
+  if (!window.fetch || !window.AbortController) return; // Keep normal link navigation available in older browsers.
   let pending = null;
   let generation = 0;
   const loadPage = async (url, id, pushHistory) => {
@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
       replacement.removeAttribute("aria-busy");
       const nextStatus = replacement.querySelector("[data-pagination-status]");
       const summary = replacement.querySelector("[data-pagination-summary]");
-      // 筆數已由 summary 顯示；status 只保留載入／錯誤提示，避免重複顯示。
+      // The summary already displays the count; reserve status for loading and error messages to avoid duplication.
       if (nextStatus) nextStatus.textContent = summary ? "" : "Page loaded.";
       region.replaceWith(replacement);
       if (pushHistory) history.pushState({ paginationId: id }, "", url.href);
@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
   };
-  // 事件委派：替換列表後不用重新綁定每個按鈕。
+  // Event delegation avoids rebinding each button after the list is replaced.
   document.addEventListener("click", event => {
     const link = event.target.closest("a[data-page-link]");
     if (!link || event.defaultPrevented || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || link.target || link.hasAttribute("download")) return;

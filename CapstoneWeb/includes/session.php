@@ -1,8 +1,13 @@
 <?php
-// 預約資料層（PHP 5.4）：查詢、日期整理、驗證及寫入；不輸出畫面。
+// Booking data layer (PHP 5.4): queries, date preparation, validation, and writes; produces no page output.
 require_once __DIR__ . '/../config/service_data.php';
 require_once __DIR__ . '/../config/booking_user.php';
 
+/**
+ * Resolve an active bookable service and, for facilities, its explicit mapping.
+ * @param bool $lock Request row locks when called inside a booking transaction.
+ * @return array|false Booking context, or false when the item is not bookable.
+ */
 function bookingContext($pdo, $serviceId, $lock = false) {
     $q = $pdo->prepare('SELECT s.service_id,s.service_title,s.service_location,s.booking_required,t.service_type_name FROM Service s JOIN ServiceType t ON t.service_type_id=s.service_type_id WHERE s.service_id=? AND s.active_status_id=1 AND t.active_status_id=1' . ($lock ? ' FOR UPDATE' : ''));
     $q->execute(array($serviceId)); $context = $q->fetch(PDO::FETCH_ASSOC); $q->closeCursor();
@@ -22,7 +27,12 @@ function bookingContext($pdo, $serviceId, $lock = false) {
     return $context;
 }
 
-// 場地頁開啟時補齊今天到第 89 天；每天開放。保留取消／既有場次，不覆寫。
+// When a facility page opens, fill dates from today through day 89, with daily availability. Preserve cancelled and existing sessions without overwriting them.
+/**
+ * Generate missing morning/afternoon slots over the rolling 90-day window.
+ * Lock the facility during generation and preserve existing/cancelled sessions.
+ * This function owns its transaction and is called outside a booking insert.
+ */
 function bookingEnsureFacilitySlots($pdo, $context) {
     $pdo->beginTransaction();
     try {
@@ -44,7 +54,14 @@ function bookingEnsureFacilitySlots($pdo, $context) {
     } catch (Exception $e) { if ($pdo->inTransaction()) { $pdo->rollBack(); } throw $e; }
 }
 
-// 列表、Book now 與 POST 共用規則；$sessionId 用來驗證指定時段的所屬及可用性。
+// Share rules across lists, Book now links, and POST requests; $sessionId verifies ownership and availability of the selected session.
+/**
+ * Apply the same availability rules for listings, detail links and submission.
+ * Confirmed service bookings consume participant capacity; Pending/Confirmed
+ * facility bookings block the whole slot. Dates and booking windows use DB time.
+ * @param int|null $sessionId Optionally restrict and validate one session.
+ * @return array Available sessions with date, location and display labels.
+ */
 function bookingAvailableSessions($pdo, $context, $sessionId = null) {
     if ($context['kind'] === 'facility') {
         $sql = "SELECT x.facility_session_id AS id,x.session_start_at,x.session_end_at,'' AS session_title,NULL AS session_location,NULL AS remaining FROM FacilitySession x WHERE x.facility_id=? AND x.session_status_id=1 AND x.session_start_at>NOW() AND DATE(x.session_start_at) BETWEEN CURDATE() AND DATE_ADD(CURDATE(),INTERVAL 89 DAY) AND NOT EXISTS (SELECT 1 FROM FacilityBooking b WHERE b.facility_session_id=x.facility_session_id AND b.booking_status_id IN (1,2))";
@@ -71,11 +88,21 @@ function bookingAvailableSessions($pdo, $context, $sessionId = null) {
     return $rows;
 }
 
+/**
+ * Read and trim a scalar value from the supplied GET or POST array.
+ */
 function bookingInput($data, $key) { return isset($data[$key]) && is_string($data[$key]) ? trim($data[$key]) : ''; }
+/**
+ * Require a real calendar date in the exact YYYY-MM-DD format.
+ */
 function bookingValidDate($value) {
     if (!preg_match('/^([0-9]{4})-([0-9]{2})-([0-9]{2})$/D', $value, $m)) { return false; }
     return checkdate((int)$m[2],(int)$m[3],(int)$m[1]);
 }
+/**
+ * Validate participant names and email before starting a booking insert.
+ * @return array User-facing validation messages.
+ */
 function bookingValidateParticipant($values) {
     $errors = array();
     foreach (array('first_name'=>'First name','surname'=>'Surname') as $key=>$label) {
@@ -86,7 +113,15 @@ function bookingValidateParticipant($values) {
     return $errors;
 }
 
-// 呼叫端先驗證 CSRF／欄位。鎖定服務及時段後重新檢查，避免同時送出搶到場地。
+// The caller validates CSRF and fields first. Lock the service and session, then recheck to prevent concurrent facility bookings.
+/**
+ * Insert a Pending booking after locking the service/facility and session.
+ * The caller owns the transaction and must validate the form token and fields.
+ * Recheck availability under the locks, then link the authenticated user if any.
+ * Contact fields are saved as a snapshot; a guest has no linked user ID.
+ * @return array Receipt reference, facility flag and session start time.
+ * @throws DomainException When the selected item/date/session is unavailable.
+ */
 function bookingInsert($pdo, $serviceId, $sessionId, $date, $values) {
     $context = bookingContext($pdo,$serviceId,true);
     if (!$context) { throw new DomainException('This item is no longer accepting bookings.'); }
@@ -105,6 +140,13 @@ function bookingInsert($pdo, $serviceId, $sessionId, $date, $values) {
     return array('reference'=>($facility ? 'F-' : 'S-') . $pdo->lastInsertId(),'facility'=>$facility,'session'=>$rows[0]['session_start_at']);
 }
 
+/**
+ * Coordinate member prefilling, booking POST validation and calendar data.
+ * Valid submissions run bookingInsert inside a transaction, consume the form
+ * token and redirect before rendering a receipt. Invalid input preserves values.
+ * Generate facility slots as needed, then group availability into calendar weeks.
+ * @return array Calendar state, values, errors, context and optional receipt.
+ */
 function bookingPageData() {
     authStart();
     header('Cache-Control: no-store');

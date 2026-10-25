@@ -1,14 +1,17 @@
 <?php
 require_once __DIR__.'/config/auth.php'; header('Cache-Control: no-store');
+// Registration controller: validate identity, password confirmation and privacy consent.
 $errors=array(); $data=array(); foreach (array('user_first_name','user_surname','user_email','user_phone_number','user_address','user_gender','preferred_contact_method','user_date_of_birth') as $key) { $data[$key]=authInput($key); }
 if ($_SERVER['REQUEST_METHOD']==='POST') {
  $errors=authProfileValidate($data); if (!authCsrf()) { $errors[]='Your form expired. Please try again.'; }
  $password=authPassword('password');
  if (strpos($password,chr(0))!==false) { $errors[]='The password contains an unsupported character.'; }
+ // The maximum is bcrypt's 72-byte input limit, not a Unicode character limit.
  if (strlen($password)<15 || strlen($password)>72) { $errors[]='Use a password between 15 and 72 bytes (15–72 characters for English text).'; }
  if ($password!==authPassword('confirm_password')) { $errors[]='The passwords do not match.'; }
  if (authInput('accept_privacy')!=='yes') { $errors[]='Please agree to the Privacy Policy.'; }
  if (!$errors) { try {
+  // Public registration always assigns role 1; administrator roles are not form inputs.
   $q=authDb()->prepare('INSERT INTO User (role_id,user_first_name,user_surname,user_email,password_hash) VALUES (1,?,?,?,?)'); $q->execute(array($data['user_first_name'],$data['user_surname'],$data['user_email'],password_hash($password,PASSWORD_DEFAULT)));
   header('Location: ./login.php?registered=1'); exit;
  } catch (Exception $e) {

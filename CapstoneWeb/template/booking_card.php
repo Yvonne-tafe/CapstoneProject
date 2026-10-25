@@ -1,4 +1,4 @@
-<?php // 共用預約卡片，只顯示 show_booking_list.php 整理好的資料。 ?>
+<?php // Shared booking card: display only data prepared by show_booking_list.php. ?>
 <article class="service-card" data-bookable-service-id="<?= (int)$item['service_id'] ?>">
   <span class="section-badge"><?= serviceEscape($item['service_type_name']) ?></span>
   <h3 class="card-title"><?= serviceEscape($item['service_title']) ?></h3>

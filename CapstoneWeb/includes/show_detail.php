@@ -1,5 +1,5 @@
 <?php
-// 資料層：只回傳資料，不產生 HTML，也不是公開 JSON API。
+// Data layer: return data only, without HTML output; this is not a public JSON API.
 require_once __DIR__ . '/../config/service_data.php';
 require_once __DIR__ . '/../config/catalog_pages.php';
 require_once __DIR__ . '/session.php';
@@ -19,7 +19,7 @@ function loadServiceDetailJson($rawId, $type = 'Service') {
             $q->execute(array_merge(array(':id' => $id), $filter['params'])); $service = $q->fetch(); $q->closeCursor();
             if (!$service) { $status = 404; $data['error'] = 'This ' . strtolower($config['singular']) . ' is not available.'; }
             else {
-                // 只傳版型需要的公開欄位，不傳管理員備註。
+                // Expose only the public fields required by the template; omit administrator notes.
                 $fields = array('service_id','service_title','service_type_name','service_quick_desc','service_short_desc','service_location','service_session_details','booking_required','service_booking_requirements','service_contact_name','service_contact_phone','service_contact_email');
                 $public = array(); foreach ($fields as $field) { $public[$field] = $service[$field]; }
                 $public['badge'] = $service['service_quick_desc'] ? $service['service_quick_desc'] : $service['service_type_name'];
@@ -57,7 +57,7 @@ function loadServiceDetailJson($rawId, $type = 'Service') {
                 }
                 unset($session);
                 $booking = bookingContext($pdo,$id);
-                // 先補齊場地的滾動日期，避免舊時段過期後沒有入口可開啟預約頁。
+                // Populate rolling facility dates first so expired sessions do not leave users without a booking entry point.
                 if ($booking && $booking['kind']==='facility') { bookingEnsureFacilitySlots($pdo,$booking); }
                 $available = $booking ? bookingAvailableSessions($pdo,$booking) : array();
                 $data['service']['booking_url'] = $available ? './booking-sessions.php?service_id=' . $id : null;

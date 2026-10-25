@@ -1,5 +1,5 @@
 <?php
-// 畫面層：由 show_list.php 取得公告 JSON；每頁最多 10 筆。
+// Presentation layer: retrieve announcement JSON from show_list.php, with up to 10 items per page.
 require_once __DIR__ . '/includes/show_list.php';
 $result=loadAnnouncementListJson(isset($_GET['page']) ? $_GET['page'] : null);
 http_response_code($result['status']);

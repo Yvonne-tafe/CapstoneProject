@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/service_data.php';
-// 清單與詳細頁使用完全相同的公開條件。
+// Use identical public visibility rules for list and detail pages.
 function announcementPublicFrom() {
     return ' FROM Announcement a JOIN AnnouncementType t ON t.announcement_type_id=a.announcement_type_id WHERE a.active_status_id=1 AND t.active_status_id=1 AND a.announcement_status_id=2 AND a.announcement_published_at<=NOW()';
 }

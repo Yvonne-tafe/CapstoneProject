@@ -1,5 +1,5 @@
 /* ========================================== */
-/* 1. 共用 CSS 變數與基礎設定                  */
+/* 1. Shared CSS variables and base settings                  */
 /* ========================================== */
 :root {
   --color-primary: #0D4F85;
@@ -36,7 +36,7 @@ body {
 }
 
 /* ========================================== */
-/* 2. 共用按鈕元件                             */
+/* 2. Shared button components                             */
 /* ========================================== */
 .btn {
   height: 52px;
@@ -74,7 +74,7 @@ body {
 }
 
 /* ========================================== */
-/* 3. 版面區塊 (Top Bar, Header, Nav)         */
+/* 3. Layout sections (Top Bar, Header, Nav)         */
 /* ========================================== */
 .top-bar {
   width: 100%;
@@ -221,11 +221,11 @@ main {
   width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center; /* 讓裡面的 section 保持置中 */
+  align-items: center; /* Keep the contained sections centred. */
 }
 
 /* ========================================== */
-/* 4. 主要內容區塊 (Hero & Sections)           */
+/* 4. Main content (Hero & Sections)           */
 /* ========================================== */
 .hero-section {
   width: 100%;
@@ -359,7 +359,7 @@ main {
 }
 
 /* ========================================== */
-/* 5. 網格、卡片與 Form Section              */
+/* 5. Grids, cards, and Form Section              */
 /* ========================================== */
 .cards-grid,
 .announcements-grid,
@@ -434,7 +434,7 @@ main {
   font-weight: 700;
 }
 
-/* Form Section 樣式 */
+/* Form Section styles */
 .detail-section,
 .form-section {
   width: 100%;
@@ -574,7 +574,7 @@ main {
 }
 
 /* ========================================== */
-/* 6. Footer 區塊                             */
+/* 6. Footer                             */
 /* ========================================== */
 .site-footer {
   width: 100%;
@@ -625,7 +625,7 @@ main {
 }
 
 /* ========================================== */
-/* 7. 手機版響應式調整 (螢幕小於 768px)       */
+/* 7. Responsive adjustments for screens smaller than 768px       */
 /* ========================================== */
 @media screen and (max-width: 768px) {
   .announcement-detail { padding: 32px 16px 48px; }

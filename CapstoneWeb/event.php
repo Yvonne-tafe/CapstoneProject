@@ -1,5 +1,5 @@
 <?php
-// 活動入口：資料查詢與 JSON 整理交給共用資料層，版面交給共用 template。
+// Event entry point: delegate queries and JSON preparation to the shared data layer and rendering to the shared template.
 require_once __DIR__ . '/includes/show_detail.php';
 $detailResult = loadServiceDetailJson(isset($_GET['service_id']) ? $_GET['service_id'] : null, 'Event');
 http_response_code($detailResult['status']);

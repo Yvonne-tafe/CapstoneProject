@@ -1,5 +1,5 @@
 <?php
-// 接收公告 ID，取得 JSON，再交由模板呈現。保留舊的 ?id= 連結相容性。
+// Read the announcement ID, retrieve JSON, and render the template. Retain compatibility with existing ?id= links.
 require_once __DIR__ . '/includes/show_detail.php';
 $rawId = isset($_GET['announcement_id']) ? $_GET['announcement_id'] : (isset($_GET['id']) ? $_GET['id'] : null);
 $result = loadAnnouncementDetailJson($rawId);

@@ -1,5 +1,5 @@
 <?php
-// 畫面層：session.php 處理資料及提交；本頁只將資料填入 HTML。
+// Presentation layer: session.php handles data and submissions; this page fills the HTML with that data.
 require_once __DIR__ . '/includes/session.php';
 $bookingData = bookingPageData();
 require_once __DIR__ . '/layout.php';

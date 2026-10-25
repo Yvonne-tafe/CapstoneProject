@@ -1,8 +1,17 @@
 <?php
 require_once __DIR__.'/auth.php';
+/**
+ * Return the fixed form-value to display-label mapping for rates enquiries.
+ */
 function ratesEnquiryTypes() {
     return array('notice-copy'=>'Rates notice or account copy','payment'=>'Payment or account balance','payment-plan'=>'Payment arrangement','concession'=>'Pensioner or concession rebate','valuation'=>'Property valuation','ownership'=>'Ownership or postal address update','fees'=>'Fees, interest or overdue rates','other'=>'Other rates enquiry');
 }
+/**
+ * Validate enquiry fields before any insert. Names, property and details must
+ * contain non-whitespace text. Phone is required only for a phone response.
+ * Text limits use Unicode character counts; email also has a byte limit.
+ * @return array Validation messages; empty when all checked rules pass.
+ */
 function ratesEnquiryValidate($values) {
     $errors=array(); $types=ratesEnquiryTypes();
     if (!isset($types[$values['enquiry_type']])) { $errors[]='Choose a valid enquiry type.'; }
@@ -18,6 +27,13 @@ function ratesEnquiryValidate($values) {
     if ($values['response_method']==='phone' && preg_match('/\S/u',$values['phone'])!==1) { $errors[]='Enter a contact number for a phone response.'; }
     return $errors;
 }
+/**
+ * Prepare form data and process member or guest rates enquiries.
+ * Identity comes from the validated login session. Validate CSRF and a one-use
+ * form token, store contact snapshots, then redirect with a session receipt.
+ * GET new=1 clears the previous receipt so another enquiry can be entered.
+ * @return array Values, errors, confirmation reference and form token.
+ */
 function ratesEnquiryPageData() {
     header('Cache-Control: no-store');
     $data=array('values'=>array('enquiry_type'=>'','assessment_number'=>'','property_address'=>'','full_name'=>'','email'=>'','phone'=>'','enquiry_details'=>'','response_method'=>'email'),'errors'=>array(),'success'=>null);
@@ -32,9 +48,11 @@ function ratesEnquiryPageData() {
             $data['errors']=ratesEnquiryValidate($data['values']);
             if (!authCsrf() || empty($_SESSION['rates_form_token']) || !hash_equals($_SESSION['rates_form_token'],authInput('form_token'))) { $data['errors'][]='This form expired or was already submitted. Please try again.'; }
             if (!$data['errors']) {
+                // Save submitted contact details as a snapshot; user linkage comes from the session.
                 $v=$data['values'];
                 $q=authDb()->prepare('INSERT INTO RatesEnquiry (user_id,enquiry_type,assessment_number,property_address,full_name,email,phone,enquiry_details,response_method) VALUES (?,?,?,?,?,?,?,?,?)');
                 $q->execute(array($member?$member['user_id']:null,$v['enquiry_type'],$v['assessment_number']===''?null:$v['assessment_number'],$v['property_address'],$v['full_name'],$v['email'],$v['phone']===''?null:$v['phone'],$v['enquiry_details'],$v['response_method']));
+                // Consume the one-use token and redirect; the following GET displays the receipt.
                 $_SESSION['rates_receipt']='R-'.authDb()->lastInsertId(); unset($_SESSION['rates_form_token']);
                 header('Location: ./rates-enquiry.php',true,303); exit;
             }

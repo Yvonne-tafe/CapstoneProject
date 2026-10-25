@@ -1,6 +1,12 @@
 <?php
 require_once __DIR__ . '/auth.php';
 
+/**
+ * Combine service and facility history for one authenticated member.
+ * Use the validated session user ID in both queries. Retain historical and
+ * cancelled bookings and their saved participant contact details.
+ * @return array Combined history ordered by booking time, newest first.
+ */
 function accountBookings($userId) {
     // Include inactive services and past/cancelled sessions in the member's history.
     $sql = "SELECT CONCAT('S-',b.booking_id) AS reference, 'Activity / service' AS booking_type,
@@ -24,6 +30,9 @@ function accountBookings($userId) {
     return $rows;
 }
 
+/**
+ * Format a stored booking time for display in Australia/Perth.
+ */
 function accountBookingTime($value) {
     $date = new DateTime($value,new DateTimeZone('Australia/Perth'));
     return $date->format('d M Y, g:i a');

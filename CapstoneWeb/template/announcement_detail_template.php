@@ -1,5 +1,5 @@
 <?php
-// 純顯示版型：只解讀 JSON，查詢與資料整理由 show_detail.php 負責。
+// Presentation-only template: parse JSON; show_detail.php handles queries and data preparation.
 if (!isset($detailJson)) { header('Location: ../announcements.php',true,302); exit; }
 require_once __DIR__ . '/../layout.php';
 function detailEscape($value) { return htmlspecialchars((string)$value,ENT_QUOTES,'UTF-8'); }

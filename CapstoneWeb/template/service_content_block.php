@@ -1,4 +1,4 @@
-<?php // 純呈現片段：$block 已由資料層整理，這裡只填值與迴圈。 ?>
+<?php // Presentation-only partial: $block is prepared by the data layer; only populate values and loop here. ?>
 <?php if ($block['content_type'] === 'image'): ?>
 <figure class="announcement-feature-image" data-content-key="<?= detailEscape($block['content_key']) ?>">
   <img src="<?= detailEscape($block['image_url']) ?>" alt="<?= detailEscape($block['image_alt_text']) ?>">

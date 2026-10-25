@@ -1,15 +1,19 @@
 <?php
 require_once __DIR__.'/config/auth.php'; header('Cache-Control: no-store');
+// Member login controller: validate the request, enforce throttling, then verify credentials.
 $errors=array(); $email=authInput('email');
 if ($_SERVER['REQUEST_METHOD']==='POST') {
  if (!authCsrf()) { $errors[]='Your form expired. Please try again.'; }
  else { try {
+  // Count recent failed audit entries for this email or IP before verification.
   $keys=array('email:'.hash('sha256',strtolower($email)),'ip:'.hash('sha256',isset($_SERVER['REMOTE_ADDR'])?$_SERVER['REMOTE_ADDR']:''));
   $q=authDb()->prepare("SELECT COUNT(*) FROM AuditLog WHERE event_type='login_attempt' AND event_result='failure' AND occurred_at>DATE_SUB(NOW(),INTERVAL 15 MINUTE) AND audit_log_note IN (?,?)"); $q->execute($keys); $limited=(int)$q->fetchColumn()>=10; $q->closeCursor();
   if ($limited) { $errors[]='Too many attempts. Please try again in 15 minutes.'; }
   else {
    $q=authDb()->prepare('SELECT user_id,password_hash FROM User WHERE user_email=?'); $q->execute(array($email)); $user=$q->fetch(); $q->closeCursor();
+   // Use a fallback hash for missing users so password verification still runs.
    $valid=password_verify(authPassword('password'),$user?$user['password_hash']:'$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi.');
+   // Rotate login state only after the password has been verified.
    if ($user && $valid) { authLogin($user['user_id']); header('Location: ./account.php'); exit; }
    $q=authDb()->prepare("INSERT INTO AuditLog (event_type,event_result,audit_log_note) VALUES ('login_attempt','failure',?)"); foreach ($keys as $key) { $q->execute(array($key)); }
    $errors[]='Email or password is incorrect.';

@@ -1,5 +1,10 @@
 <?php
 require_once __DIR__.'/auth.php';
+/**
+ * Require an authenticated admin role before processing a management page.
+ * Redirect guests, return 403 for other roles, and return 503 on lookup failure.
+ * @return array The authenticated administrator.
+ */
 function adminRequire() {
     header('Cache-Control: no-store');
     try { $user=authCurrentUser(); }
@@ -8,6 +13,10 @@ function adminRequire() {
     if ($user['role_name']!=='admin') { http_response_code(403); exit('Administrator access is required.'); }
     return $user;
 }
+/**
+ * Return the trusted record-kind mappings used by the dashboard and editors.
+ * Table and column identifiers come from this allowlist, not arbitrary input.
+ */
 function adminDefinitions() {
     return array(
       'booking'=>array('title'=>'Bookings','table'=>'Booking','id'=>'booking_id','status'=>'booking_status_id','statuses'=>'BookingStatus','status_name'=>'booking_status_name','date'=>'booked_at','note'=>'booking_note','prefix'=>'S-','page'=>'admin-booking.php'),
@@ -16,8 +25,19 @@ function adminDefinitions() {
       'rates'=>array('title'=>'Rates enquiries','table'=>'RatesEnquiry','id'=>'rates_enquiry_id','status'=>'rates_enquiry_status_id','statuses'=>'RatesEnquiryStatus','status_name'=>'rates_enquiry_status_name','date'=>'submitted_at','note'=>'rates_enquiry_note','resolution'=>'rates_enquiry_resolution','prefix'=>'R-','page'=>'admin-rate-enquiry.php')
     );
 }
+/**
+ * Read a scalar GET value without accepting array parameters.
+ */
 function adminGet($key) { return isset($_GET[$key]) && is_string($_GET[$key])?$_GET[$key]:''; }
+/**
+ * Format stored date/time values in Australia/Perth for administrator display.
+ */
 function adminTime($value) { return $value?(new DateTime($value,new DateTimeZone('Australia/Perth')))->format('d M Y, g:i a'):'Not recorded'; }
+/**
+ * Load dashboard rows for a supported record kind with constrained sorting.
+ * @param string $kind A key supplied by adminDefinitions().
+ * @return array Rows containing display fields and current status.
+ */
 function adminRows($kind) {
     $defs=adminDefinitions(); $d=$defs[$kind];
     $sort=adminGet($kind.'_sort'); $dir=adminGet($kind.'_dir')==='asc'?'ASC':'DESC';
@@ -30,6 +50,9 @@ function adminRows($kind) {
     $q=authDb()->query('SELECT b.'.$d['id'].' AS id,b.'.$d['date'].' AS date,st.'.$d['status_name'].' AS status,'.$fields.' FROM '.$d['table'].' b JOIN '.$d['statuses'].' st ON st.'.$d['status'].'=b.'.$d['status'].$join.' ORDER BY '.$column.' '.$dir.',b.'.$d['id'].' DESC');
     return $q->fetchAll(PDO::FETCH_ASSOC);
 }
+/**
+ * Toggle one dashboard sort direction while preserving the other list sorts.
+ */
 function adminSortUrl($kind,$field) {
     $params=array(); foreach (adminDefinitions() as $key=>$unused) { foreach (array('sort','dir') as $suffix) { $name=$key.'_'.$suffix; $value=adminGet($name); if ($value!=='') { $params[$name]=$value; } } }
     $params[$kind.'_sort']=$field;
@@ -37,8 +60,24 @@ function adminSortUrl($kind,$field) {
     $params[$kind.'_dir']=$currentSort===$field && adminGet($kind.'_dir')!=='asc'?'asc':'desc';
     return './admin.php?'.http_build_query($params).'#'.$kind;
 }
+/**
+ * Build the configured editor route for a supported record kind and ID.
+ */
 function adminEditUrl($kind,$id) { $defs=adminDefinitions(); return './'.$defs[$kind]['page'].'?'.http_build_query(array('kind'=>$kind,'id'=>$id)); }
+/**
+ * Load allowed status choices from the configured lookup table.
+ */
 function adminStatusOptions($d) { return authDb()->query('SELECT '.$d['status'].' AS id,'.$d['status_name'].' AS name FROM '.$d['statuses'].' ORDER BY '.$d['status'])->fetchAll(PDO::FETCH_ASSOC); }
+/**
+ * Apply an administrator status/notes update inside a database transaction.
+ * The caller must enforce admin access, CSRF, allowed status and text limits.
+ * Reject stale record versions before updating. Booking transitions recheck
+ * capacity or exclusive-slot conflicts; resolutions follow the workflow rules.
+ * Write an audit event and commit together, or roll back and rethrow.
+ * @param string $kind A trusted key from adminDefinitions().
+ * @param string $version SHA-256 fingerprint of the record originally displayed.
+ * @throws DomainException When state, capacity or resolution rules reject a change.
+ */
 function adminSave($kind,$id,$status,$note,$resolution,$version) {
     $defs=adminDefinitions(); $d=$defs[$kind]; $db=authDb(); $db->beginTransaction();
     try {
@@ -58,9 +97,11 @@ function adminSave($kind,$id,$status,$note,$resolution,$version) {
         }
         $q=$db->prepare('SELECT * FROM '.$d['table'].' WHERE '.$d['id'].'=? FOR UPDATE'); $q->execute(array($id)); $row=$q->fetch(); $q->closeCursor();
         if (!$row) { throw new DomainException('This record no longer exists.'); }
+        // Refuse stale edits rather than overwriting a concurrent administrator update.
         if (!hash_equals(hash('sha256',serialize($row)),$version)) { throw new DomainException('This record changed since you opened it. Reload the page before saving.'); }
         if ($kind==='booking' || $kind==='facility') {
             $old=(int)$row[$d['status']];
+            // Service capacity is held by Confirmed only; facilities are held by Pending/Confirmed.
             $reserving=$kind==='booking'?$status===2:in_array($status,array(1,2),true);
             if ($status!==$old && $reserving) {
                 if (!$slot || !$slot['future'] || (int)$slot['session_status_id']!==1) { throw new DomainException('Only future scheduled sessions can be reserved or confirmed.'); }
@@ -83,10 +124,16 @@ function adminSave($kind,$id,$status,$note,$resolution,$version) {
             $q=$db->prepare('UPDATE '.$d['table'].' SET '.$d['status'].'=?,'.$d['note'].'=?,'.$d['resolution'].'=?,resolved_at=CASE WHEN ?=3 THEN COALESCE(resolved_at,NOW()) WHEN ?=4 THEN resolved_at ELSE NULL END WHERE '.$d['id'].'=?');
             $q->execute(array($status,$note===''?null:$note,$resolution===''?null:$resolution,$status,$status,$id));
         }
+        // Commit the record update and its audit event as one transaction.
         $q=$db->prepare("INSERT INTO AuditLog (user_id,event_type,event_result,audit_log_note) VALUES (?,'admin_update','success',?)"); $admin=authCurrentUser(); $q->execute(array($admin['user_id'],$kind.' '.$id.' status '.$status));
         $db->commit();
     } catch (Exception $e) { if ($db->inTransaction()) { $db->rollBack(); } throw $e; }
 }
+/**
+ * Coordinate the shared GET/POST editor after enforcing administrator access.
+ * Validate input, save valid changes, then redirect to the matching dashboard
+ * section. Preserve errors for redisplay and mark first-read times for requests.
+ */
 function adminEditor($kind) {
     adminRequire(); $defs=adminDefinitions(); $d=$defs[$kind]; $id=servicePositiveInt(adminGet('id')); $errors=array(); $row=null; $options=array();
     if (!$id) { http_response_code(400); $errors[]='A valid record ID is required.'; }
@@ -105,6 +152,7 @@ function adminEditor($kind) {
             }
             http_response_code(422);
         }
+        // Mark first read once without changing the processing status.
         if ($kind==='feedback' || $kind==='rates') { $q=authDb()->prepare('UPDATE '.$d['table'].' SET read_at=COALESCE(read_at,NOW()) WHERE '.$d['id'].'=?'); $q->execute(array($id)); }
         $q=authDb()->prepare('SELECT * FROM '.$d['table'].' WHERE '.$d['id'].'=?'); $q->execute(array($id)); $row=$q->fetch(); $q->closeCursor();
         if (!$row) { http_response_code(404); $errors[]='This record was not found.'; }
